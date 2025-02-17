@@ -1,1 +1,2 @@
-1. Lanjut fitur Edit dan Hapus Barang Masuk dan Stok
+1. Lanjut fitur CRUD data bencana
+2. Lanjut fitur CRUD barang keluar

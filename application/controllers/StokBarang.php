@@ -5,7 +5,6 @@ class StokBarang extends CI_Controller {
 	public function __construct() {
         parent::__construct();
         $this->load->model('stokmodel');
-        $this->load->model('stokmodel');
     }
 
 	public function index()
