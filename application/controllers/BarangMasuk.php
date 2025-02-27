@@ -7,6 +7,14 @@ class BarangMasuk extends CI_Controller {
         $this->load->model('masterdatamodel');
         $this->load->model('barangmasukmodel');
         $this->load->model('kondisiterkinimodel');
+		if (!$this->session->userdata('id_auth')) {
+			redirect(base_url('auth'));
+		}
+
+		if ($this->session->userdata('role') == 'pengguna' || $this->session->userdata('role') == 'kepala_dinas') {
+			$this->session->set_flashdata('error', 'Anda tidak punya akses ke halaman tersebut. Silahkan login dan masuk ke halaman yang diizinkan!');
+			redirect(base_url('logout'));
+		}
     }
 	
 	public function index()
@@ -30,9 +38,9 @@ class BarangMasuk extends CI_Controller {
 			'barang_masuk' => $barang_masuk
 		];
 		$this->load->view('templates/header', $data);
-		$this->load->view('pages/barangmasuk');
+		$this->load->view('pages/admin/barangmasuk');
 		$this->load->view('templates/footer');
-		$this->load->view('pages/modals/barangmasuk');
+		$this->load->view('pages/admin/modals/barangmasuk');
 	}
 
 	public function add()
@@ -77,7 +85,8 @@ class BarangMasuk extends CI_Controller {
 			$data_kondisi = [
 				'kondisi_logpal_id' => $value['id_kondisi'],
 				'stok_id' => $stok_id,
-				'jumlah' => $jumlah_perkondisi
+				'stok_masuk' => $jumlah_perkondisi,
+				'stok_terkini' => $jumlah_perkondisi
 			];
 
 			// Insert data kondisi terkini
@@ -145,7 +154,8 @@ class BarangMasuk extends CI_Controller {
 			$data_kondisi = [
 				'kondisi_logpal_id' => $value['id_kondisi'],
 				'stok_id' => $stok_id,
-				'jumlah' => $jumlah_perkondisi
+				'stok_masuk' => $jumlah_perkondisi,
+				'stok_terkini' => $jumlah_perkondisi
 			];
 
 			// Periksa apakah data kondisi sudah ada untuk stok ini
@@ -176,7 +186,7 @@ class BarangMasuk extends CI_Controller {
 	public function delete()
 	{
 		// Ambil stok_id dari form
-		$stok_id = $this->input->post('stok_id');
+		$stok_id = htmlspecialchars($this->input->post('stok_id'));
 
 		// Mulai transaksi
 		$this->db->trans_start();
@@ -198,6 +208,29 @@ class BarangMasuk extends CI_Controller {
 			// Commit transaksi jika berhasil
 			$this->db->trans_commit();
 			$this->session->set_flashdata('success', 'Data berhasil dihapus.');
+		}
+
+		// Redirect kembali ke halaman barang masuk
+		redirect('barangmasuk');
+	}
+
+	public function masuk_stok()
+	{
+		// Ambil stok_id dari form
+		$stok_id = htmlspecialchars($this->input->post('stok_id'));
+		if ($stok_id) {
+			$stok_masuk = [
+				'masuk_stok' => 'sudah'
+			];
+			// Jika ID ada, maka update data
+			$update = $this->barangmasukmodel->update_data($stok_id, $stok_masuk);
+			if($update){
+				$this->session->set_flashdata('success', 'Data berhasil dimasukan ke stok!');
+			}else{
+				$this->session->set_flashdata('error', 'Data gagal dimasukan ke stok!');
+			}
+		}else{
+			$this->session->set_flashdata('error', 'Data tidak ditemukan.');
 		}
 
 		// Redirect kembali ke halaman barang masuk

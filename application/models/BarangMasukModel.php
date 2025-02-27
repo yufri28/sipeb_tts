@@ -15,6 +15,33 @@ class BarangMasukModel extends CI_Model {
         return $this->db->get()->result_array();
     }
 
+    public function get_barang_masuk_per_bulan() {
+        // Query untuk menghitung total barang masuk per jenis barang dan per bulan
+        $this->db->select('master_jenis_barang.nama_jenisbarang, DATE_FORMAT(stok.tanggal_masuk, "%b %Y") as bulan, SUM(stok.jumlah) as jumlah');
+        $this->db->from('stok');
+        $this->db->join('master_jenis_barang', 'stok.jenis_barang_id = master_jenis_barang.id_jenisbarang'); // Join untuk mendapatkan nama barang
+        $this->db->group_by(['master_jenis_barang.nama_jenisbarang', 'bulan']);  // Kelompokkan berdasarkan nama barang dan bulan
+        $this->db->order_by('bulan', 'ASC');  // Urutkan berdasarkan bulan
+    
+        return $this->db->get()->result_array();  // Kembalikan hasil dalam bentuk array
+    }    
+
+    public function get_jumlah_barang_masuk_perbulan() {
+        $this->db->select_sum('jumlah', 'barang_masuk_bulan_ini');
+        $this->db->where('MONTH(tanggal_masuk)', 'MONTH(CURRENT_DATE())', FALSE);
+        $this->db->where('YEAR(tanggal_masuk)', 'YEAR(CURRENT_DATE())', FALSE);
+        $query = $this->db->get('stok');
+        return $query->row_array();
+    }    
+
+    public function get_barang_masuk_bulan_ini() {
+        $this->db->select_sum('jumlah');  // Mengambil jumlah total barang masuk
+        $this->db->from('stok');  // Nama tabel barang masuk
+        $this->db->where('MONTH(tanggal_masuk)', date('m'));  // Filter berdasarkan bulan saat ini
+        $this->db->where('YEAR(tanggal_masuk)', date('Y'));   // Filter berdasarkan tahun saat ini
+        return $this->db->get()->row()->jumlah;  // Mengembalikan jumlah barang masuk
+    }    
+
     // Memasukkan data ke tabel
     public function insert_data($data) {
         return $this->db->insert('stok', $data);

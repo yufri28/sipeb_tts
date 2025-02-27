@@ -53,6 +53,47 @@ class KondisiTerkiniModel extends CI_Model {
         }
     }
 
+    public function update_jumlah($id, $jumlah, $action = 'kurangi')
+    {
+        if ($action === 'kurangi') {
+            // Mengurangi stok_terkini dengan jumlah yang diberikan
+            $this->db->set('stok_terkini', 'stok_terkini - ' . (int)$jumlah, FALSE);
+        } elseif ($action == 'tambah') {
+            // Menambah stok_terkini dengan jumlah yang diberikan
+            $this->db->set('stok_terkini', 'stok_terkini + ' . (int)$jumlah, FALSE);
+        } else {
+            return false; // Action tidak valid
+        }
+
+        // Update stok_terkini berdasarkan id_kondisi_terkini
+        $this->db->where('id_kondisi_terkini', $id);
+        $this->db->update('kondisi_terkini');
+
+        // Cek apakah ada baris yang di-update
+        if ($this->db->affected_rows() > 0) {
+            return true; // Menandakan bahwa pembaruan berhasil
+        } else {
+            return false; // Menandakan tidak ada perubahan (misalnya ID tidak ditemukan)
+        }
+    }
+
+
+    // public function update_jumlah($id, $jumlah)
+    // {
+    //     // Mengurangi kondisi_terkini dengan jumlah yang diberikan
+    //     $this->db->set('stok_terkini', 'stok_terkini - ' . (int)$jumlah, FALSE);
+    //     $this->db->where('id_kondisi_terkini', $id);
+    //     $this->db->update('kondisi_terkini'); // Ganti 'produk' dengan nama tabel yang sesuai
+
+    //     if ($this->db->affected_rows() > 0) {
+    //         return true; // Menandakan bahwa pembaruan berhasil
+    //     } else {
+    //         return false; // Menandakan bahwa tidak ada perubahan (misalnya ID tidak ditemukan)
+    //     }
+    // }
+    
+
+
 }
 
 ?>

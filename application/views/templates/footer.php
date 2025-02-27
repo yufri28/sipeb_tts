@@ -33,27 +33,6 @@
     <div class="custom-content">
         <div class="switcher">
             <div class="switch-block">
-                <h4>Logo Header</h4>
-                <div class="btnSwitch">
-                    <button type="button" class="selected changeLogoHeaderColor" data-color="dark"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="blue"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="purple"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="light-blue"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="green"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="orange"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="red"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="white"></button>
-                    <br />
-                    <button type="button" class="changeLogoHeaderColor" data-color="dark2"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="blue2"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="purple2"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="light-blue2"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="green2"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="orange2"></button>
-                    <button type="button" class="changeLogoHeaderColor" data-color="red2"></button>
-                </div>
-            </div>
-            <div class="switch-block">
                 <h4>Navbar Header</h4>
                 <div class="btnSwitch">
                     <button type="button" class="changeTopBarColor" data-color="dark"></button>
@@ -128,6 +107,7 @@
 <!-- <script src="<?=base_url("assets/js/demo.js");?>"></script> -->
 <!-- Tambahkan Dashboard-js ke posisi ini -->
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- Alerts -->
 <!-- begin::Alert -->
@@ -204,10 +184,54 @@ $(document).ready(function() {
         },
     });
 
+    $("#multi-filter-select2").DataTable({
+        pageLength: 5,
+        scrollX: true,
+        screenY: true,
+        initComplete: function() {
+            this.api()
+                .columns()
+                .every(function() {
+                    var column = this;
+                    var select = $(
+                            '<select class="form-select"><option value=""></option></select>'
+                        )
+                        .appendTo($(column.footer()).empty())
+                        .on("change", function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+                            column
+                                .search(val ? "^" + val + "$" : "", true, false)
+                                .draw();
+                        });
+
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function(d, j) {
+                            select.append(
+                                '<option value="' + d + '">' + d + "</option>"
+                            );
+                        });
+                });
+        },
+    });
+
     $("#no-filter-select").DataTable({
         pageLength: 5,
         scrollX: true,
         screenY: true,
+    });
+
+    // Initialize the Barang Masuk table
+    var barangMasukTable = $("#barangMasuk").DataTable({
+        pageLength: 5,
+    });
+
+    // Initialize the Barang Keluar table
+    var barangKeluarTable = $("#barangKeluar").DataTable({
+        pageLength: 5,
     });
 
     $("#tb-master-barang").DataTable({

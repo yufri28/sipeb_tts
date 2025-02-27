@@ -8,6 +8,14 @@ class DataBencana extends CI_Controller {
 		require_once FCPATH . 'vendor/autoload.php';
         $this->load->model('databencanamodel');
         $this->load->model('masterdatamodel');
+		if (!$this->session->userdata('id_auth')) {
+			redirect(base_url('auth'));
+		}
+
+		if ($this->session->userdata('role') == 'pengguna' || $this->session->userdata('role') == 'kepala_dinas') {
+			$this->session->set_flashdata('error', 'Anda tidak punya akses ke halaman tersebut. Silahkan login dan masuk ke halaman yang diizinkan!');
+			redirect(base_url('logout'));
+		}
     }
 	
 	public function index()
@@ -21,9 +29,9 @@ class DataBencana extends CI_Controller {
 		];
 		
 		$this->load->view('templates/header', $data);
-		$this->load->view('pages/databencana');
+		$this->load->view('pages/admin/databencana');
 		$this->load->view('templates/footer');
-		$this->load->view('pages/modals/databencana');
+		$this->load->view('pages/admin/modals/databencana');
 	
 	}
 

@@ -1,2 +1,23 @@
-1. Lanjut fitur CRUD data bencana
-2. Lanjut fitur CRUD barang keluar
+1. Tambahkan menu register pengguna untuk melakukan peminjaman
+    - Nama, Username dan Password ✅
+    - Buatkan hak akses untuk pengguna tidak masuk ke dashboard admin ✅
+
+2. Fitur peminjaman barang oleh pengguna
+    - Input data pinjam (No HP yang bisa dihubungi, Alamat, Barang Yang Mau dipinjam, 
+    Tanggal Mulai, Tanggal Selesai, Keperluan) ✅
+
+3. Fitur peminjaman oleh admin
+    - Input data pinjam (No HP yang bisa dihubungi, Alamat, Barang Yang 
+    Mau dipinjam, Tanggal Mulai, Tanggal Selesai, Keperluan) ✅
+
+4. Fitur pengembalian barang
+    - Tambahkan status pinjam (dipinjam/dikembalikan) dan mengembalikan stok ketika dikembalikan ✅
+
+5. Fitur Disposisi Kepala Dinas
+    - Input data disposisi (Konfirmasi diterima/tidak dan pesan kepada pengguna) ✅
+    - Ketika disetujui, munculkan notifikasi/penanda kepada admin bahwa ada peminjaman yang disetujui sehingga admin
+      bisa mempersiapkan barang2 dan membuatkan serah terima untuk ditanda tangani penerima dan pemberi.✅
+
+6. Tambah fitur upload pdf bukti serah terima barang
+
+7. Cleaning Code
