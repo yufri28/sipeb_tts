@@ -9,6 +9,7 @@
 
     <!-- Fonts and icons -->
     <script src="<?=base_url("assets/js/plugin/webfont/webfont.min.js");?>"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <script>
     WebFont.load({
         google: {
@@ -87,10 +88,16 @@
                                 <p>Stok Barang</p>
                             </a>
                         </li>
-                        <li class="nav-item <?=$menu == 'databencana'?'active':'';?>">
+                        <!-- <li class="nav-item <?=$menu == 'databencana'?'active':'';?>">
                             <a href="<?=base_url("databencana");?>">
                                 <i class="fas fa-fire"></i>
                                 <p>Data Bencana</p>
+                            </a>
+                        </li> -->
+                        <li class="nav-item <?=$menu == 'peminjaman'?'active':'';?>">
+                            <a href="<?=base_url("peminjaman");?>">
+                                <i class="fa fa-handshake"></i>
+                                <p>Peminjaman</p>
                             </a>
                         </li>
                         <li class="nav-item <?=$menu == 'barangmasuk'?'active':'';?>">
@@ -131,6 +138,12 @@
                             <a href="<?=base_url("hodaccess");?>">
                                 <i class="fas fa-home"></i>
                                 <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item <?=$menu == 'stokbarang'?'active':'';?>">
+                            <a href="<?=base_url("hodaccess/stokbarang");?>">
+                                <i class="fas fa-luggage-cart"></i>
+                                <p>Stok Barang</p>
                             </a>
                         </li>
                         <li class="nav-item <?=$menu == 'peminjaman'?'active':'';?>">

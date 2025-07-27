@@ -2,7 +2,7 @@
  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true">
      <div class="modal-dialog" role="document">
          <div class="modal-content">
-             <form action="<?=base_url('useraccess/add');?>" enctype="multipart/form-data" method="post">
+             <form action="<?=base_url('peminjaman/add');?>" enctype="multipart/form-data" method="post">
                  <div class="modal-header border-0">
                      <h5 class="modal-title">
                          <span class="fw-mediumbold"> Add</span>
@@ -236,7 +236,7 @@ $(document).ready(function() {
              <div class="modal-header border-0">
                  <h5 class="modal-title">
                      <span class="fw-mediumbold"> Detail</span>
-                     <span class="fw-light"> Barang Pinjam </span>
+                     <span class="fw-light"> Peminjaman </span>
                  </h5>
                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                      <span aria-hidden="true">&times;</span>
@@ -282,15 +282,15 @@ $(document).ready(function() {
  <?php endforeach;?>
 
 
- <!-- Modal Hapus -->
- <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+ <!-- Modal Terima -->
+ <div class="modal fade" id="accModal" tabindex="-1" role="dialog" aria-hidden="true">
      <div class="modal-dialog" role="document">
          <div class="modal-content">
-             <form action="<?=base_url('useraccess/delete_peminjaman');?>" method="post">
+             <form action="<?=base_url('peminjaman/konfirmasi_peminjaman');?>" method="post">
                  <div class="modal-header border-0">
                      <h5 class="modal-title">
-                         <span class="fw-mediumbold"> Hapus</span>
-                         <span class="fw-light"> Barang Pinjam </span>
+                         <span class="fw-mediumbold"> Validasi</span>
+                         <span class="fw-light"> Peminjaman </span>
                      </h5>
                      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                          <span aria-hidden="true">&times;</span>
@@ -300,7 +300,9 @@ $(document).ready(function() {
                      <div class="row">
                          <div class="col-sm-12">
                              <div class="form-group form-group-default">
-                                 <p>Apakah anda yakin menghapus data ini?</p>
+                                 <p>Dengan ini peminjaman <strong id="nama"></strong> pada tanggal <strong
+                                         id="tanggal"></strong> dinyatakan valid?</p>
+                                 <input type="hidden" name="status" value="tunggu">
                                  <input type="hidden" name="batch_id" id="batch_id">
                              </div>
                          </div>
@@ -308,7 +310,7 @@ $(document).ready(function() {
                  </div>
                  <div class="modal-footer border-0">
                      <button type="submit" class="btn btn-primary">
-                         Delete
+                         Ya
                      </button>
                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                          Close
@@ -321,14 +323,83 @@ $(document).ready(function() {
 
  <script>
 $(document).ready(function() {
-    // Saat modal 'deleteModal' ditampilkan
-    $('#deleteModal').on('show.bs.modal', function(event) {
+    // Saat modal 'accModal' ditampilkan
+    $('#accModal').on('show.bs.modal', function(event) {
         // Ambil data dari tombol yang memicu modal
         var button = $(event.relatedTarget); // Tombol yang memicu modal
         var batchId = button.data('batch_id');
+        var nama = button.data('nama');
+        var tanggal = button.data('tanggal');
 
         // Isi input form 'batch_id' dengan data yang diambil
-        $('#deleteModal input[name="batch_id"]').val(batchId);
+        $('#accModal input[name="batch_id"]').val(batchId);
+        $('#accModal strong[id="nama"]').text(nama);
+        $('#accModal strong[id="tanggal"]').text(tanggal);
+    });
+});
+ </script>
+
+
+ <!-- Modal Tolak -->
+ <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-hidden="true">
+     <div class="modal-dialog" role="document">
+         <div class="modal-content">
+             <form action="<?=base_url('peminjaman/konfirmasi_peminjaman');?>" method="post">
+                 <div class="modal-header border-0">
+                     <h5 class="modal-title">
+                         <span class="fw-mediumbold"> Tolak</span>
+                         <span class="fw-light"> Peminjaman </span>
+                     </h5>
+                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">&times;</span>
+                     </button>
+                 </div>
+                 <div class="modal-body">
+                     <div class="row">
+                         <div class="col-sm-12">
+                             <div class="form-group form-group-default">
+                                 <p>Tolak peminjaman <strong id="nama"></strong> pada tanggal <strong
+                                         id="tanggal"></strong>?</p>
+                                 <small><i>Masukkan alasan ditolak!</i></small>
+                                 <div class="col-sm-12">
+                                     <div class="form-group form-group-default">
+                                         <label>Alasan <small class="text-danger">*</small></label></label>
+                                         <textarea required name="pesan" class="form-control" id="pesan"></textarea>
+                                     </div>
+                                 </div>
+                                 <input type="hidden" name="status" value="tolak">
+                                 <input type="hidden" name="batch_id" id="batch_id">
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="modal-footer border-0">
+                     <button type="submit" class="btn btn-primary">
+                         Tolak
+                     </button>
+                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                         Close
+                     </button>
+                 </div>
+             </form>
+         </div>
+     </div>
+ </div>
+
+ <script>
+$(document).ready(function() {
+    // Saat modal 'rejectModal' ditampilkan
+    $('#rejectModal').on('show.bs.modal', function(event) {
+        // Ambil data dari tombol yang memicu modal
+        var button = $(event.relatedTarget); // Tombol yang memicu modal
+        var batchId = button.data('batch_id');
+        var nama = button.data('nama');
+        var tanggal = button.data('tanggal');
+
+        // Isi input form 'batch_id' dengan data yang diambil
+        $('#rejectModal input[name="batch_id"]').val(batchId);
+        $('#rejectModal strong[id="nama"]').text(nama);
+        $('#rejectModal strong[id="tanggal"]').text(tanggal);
     });
 });
  </script>

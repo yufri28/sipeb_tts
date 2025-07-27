@@ -38,16 +38,18 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="multi-filter-select" class="display nowrap table table-striped table-hover">
+                            <table id="multi-filter-select-mas" class="display nowrap table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>Tanggal</th>
+                                        <th>Kode Barang</th>
                                         <th>Jenis Barang</th>
                                         <th>Jumlah</th>
                                         <th>Tahun</th>
                                         <th>Sumber</th>
                                         <th>Masuk Stok</th>
+                                        <th>Keterangan Tambahan</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -55,11 +57,12 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Tanggal</th>
+                                        <th>Kode Barang</th>
                                         <th>Jenis Barang</th>
                                         <th>Jumlah</th>
                                         <th>Tahun</th>
                                         <th>Sumber</th>
-                                        <th>Masuk Stok</th>
+                                        <!-- <th>Masuk Stok</th> -->
                                     </tr>
                                 </tfoot>
                                 <tbody>
@@ -68,6 +71,8 @@
                                     <tr>
                                         <td><?=$i++?>.</td>
                                         <td><?= date('d-m-Y', strtotime($value['tanggal_masuk'])); ?></td>
+                                        <td>BRG<?=$value['klasifikasi_id'];?><?=$value['sumber_id'];?><?=$value['id_jenisbarang'];?>
+                                        </td>
                                         <td><?=$value['nama_jenisbarang'];?></td>
                                         <td><?=$value['jumlah'];?></td>
                                         <td><?=$value['tahun'];?></td>
@@ -84,6 +89,44 @@
                                             <i class="fa fs-4 fa-check text-success" aria-hidden="true"></i>
                                         </td>
                                         <?php endif;?>
+                                        <td>
+                                            <?php
+                                                $text = $value['keterangan_tambahan'] ??'-';
+                                                $shortText = strlen($text) > 20 ? substr($text, 0, 20) . '...' : $text;
+                                            ?>
+                                            <?php if (strlen($text) > 20): ?>
+                                            <span data-bs-toggle="modal"
+                                                data-bs-target="#modalKet<?=$value['id_stok'];?>"
+                                                style="cursor:pointer; color:blue; text-decoration:underline;">
+                                                <?=$shortText;?>
+                                            </span>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalKet<?=$value['id_stok'];?>" tabindex="-1"
+                                                aria-labelledby="modalKetLabel<?=$value['id_stok'];?>"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-scrollable">
+                                                    <!-- modal-lg untuk ukuran lebih besar -->
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="modalKetLabel<?=$value['id_stok'];?>">Keterangan
+                                                                Tambahan</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="text-wrap"
+                                                                style="word-wrap: break-word; white-space: pre-wrap;">
+                                                                <?=nl2br(htmlspecialchars($text));?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php else: ?>
+                                            <?=$text;?>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <div class="form-button-action">
                                                 <?php if($value['masuk_stok'] == 'belum'):?>

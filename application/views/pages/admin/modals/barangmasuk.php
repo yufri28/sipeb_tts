@@ -13,6 +13,13 @@
                      </button>
                  </div>
                  <div class="modal-body">
+                     <div class="alert alert-warning" role="alert">
+                         <small> Jika data Jenis Barang/Klasifikasi/Satuan/Sumber tidak ada dalam pilihan,
+                             silahkan
+                             tambahkan di menu master data atau <a href="<?=base_url('masterdata')?>">klik ➡️</a>
+                             untuk
+                             langsung masuk ke master data!</small>
+                     </div>
                      <div class="row">
                          <div class="col-sm-12">
                              <div class="form-group form-group-default">
@@ -57,7 +64,7 @@
                                  </select>
                              </div>
                          </div>
-                         <div class="col-sm-12">
+                         <div class="col-sm-12 mb-3">
                              <div class="form-group form-group-default">
                                  <label>Sumber <small class="text-danger">*</small></label></label>
                                  <select required name="sumber_id" class="form-control">
@@ -177,6 +184,12 @@ document.getElementById('totalJumlah').addEventListener('input', validateInput);
                      </button>
                  </div>
                  <div class="modal-body">
+                     <div class="alert alert-warning" role="alert">
+                         <small> Jika data Jenis Barang/Klasifikasi/Satuan/Sumber tidak ada dalam pilihan, silahkan
+                             tambahkan di menu master data atau <a href="<?=base_url('masterdata')?>">klik ➡️</a>
+                             untuk
+                             langsung masuk ke master data!</small>
+                     </div>
                      <div class="row">
                          <div class="col-sm-12">
                              <div class="form-group form-group-default">

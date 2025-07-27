@@ -46,10 +46,11 @@ class MasterData extends CI_Controller {
 	{
 		$nama = htmlspecialchars($this->input->post('nama'));
 		$tabel = htmlspecialchars($this->input->post('tabel'));
-
+		
 		switch ($tabel) {
 			case 'master_jenis_barang':
-				$simpan = $this->masterdatamodel->insert_data($tabel, ['nama_jenisbarang' => $nama]);
+				$keterangan_tambahan = htmlspecialchars($this->input->post('keterangan_tambahan'));
+				$simpan = $this->masterdatamodel->insert_data($tabel, ['nama_jenisbarang' => $nama, 'keterangan_tambahan' => $keterangan_tambahan]);
 				break;
 			case 'master_jenis_bencana':
 				$simpan = $this->masterdatamodel->insert_data($tabel, ['nama_bencana' => $nama]);
@@ -64,7 +65,8 @@ class MasterData extends CI_Controller {
 				$simpan = $this->masterdatamodel->insert_data($tabel, ['nama_sumber' => $nama]);
 				break;
 			case 'klasifikasi':
-				$simpan = $this->masterdatamodel->insert_data($tabel, ['nama_klasifikasi' => $nama]);
+				$keterangan_tambahan = htmlspecialchars($this->input->post('keterangan_tambahan'));
+				$simpan = $this->masterdatamodel->insert_data($tabel, ['nama_klasifikasi' => $nama, 'keterangan_tambahan' => $keterangan_tambahan]);
 				break;
 		}
 
@@ -85,10 +87,11 @@ class MasterData extends CI_Controller {
 		$id = htmlspecialchars($this->input->post('id'));
 		$nama = htmlspecialchars($this->input->post('nama'));
 		$tabel = htmlspecialchars($this->input->post('tabel'));
-
+		
 		switch ($tabel) {
 			case 'master_jenis_barang':
-				$update = $this->masterdatamodel->update_data($tabel, ['id_jenisbarang' => $id], ['nama_jenisbarang' => $nama]);
+				$keterangan_tambahan = htmlspecialchars($this->input->post('keterangan_tambahan'));
+				$update = $this->masterdatamodel->update_data($tabel, ['id_jenisbarang' => $id], ['nama_jenisbarang' => $nama, 'keterangan_tambahan' => $keterangan_tambahan]);
 				break;
 			case 'master_jenis_bencana':
 				$update = $this->masterdatamodel->update_data($tabel, ['id_jenis_bencana' => $id], ['nama_bencana' => $nama]);
@@ -103,7 +106,8 @@ class MasterData extends CI_Controller {
 				$update = $this->masterdatamodel->update_data($tabel, ['id_sumber' => $id], ['nama_sumber' => $nama]);
 				break;
 			case 'klasifikasi':
-				$update = $this->masterdatamodel->update_data($tabel, ['id_klasifikasi' => $id], ['nama_klasifikasi' => $nama]);
+				$keterangan_tambahan = htmlspecialchars($this->input->post('keterangan_tambahan'));
+				$update = $this->masterdatamodel->update_data($tabel, ['id_klasifikasi' => $id], ['nama_klasifikasi' => $nama,'keterangan_tambahan' => $keterangan_tambahan]);
 				break;
 		}
 

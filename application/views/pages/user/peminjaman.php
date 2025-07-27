@@ -35,6 +35,28 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <div class="btn btn-sm text-white p-1 mt-2 rounded bg-warning">
+                                    verifikasi
+                                </div> : <small><i>Menunggu verifikasi data oleh admin</i></small>
+                            </div>
+                            <div class="me-2">
+                                <div class="btn btn-sm text-white p-1 mt-2 rounded bg-secondary">
+                                    tunggu
+                                </div> : <small><i>Menunggu persetujuan</i></small>
+                            </div>
+                            <div class="me-2">
+                                <div class="btn btn-sm text-white p-1 mt-2 rounded bg-success">
+                                    terima
+                                </div> : <small><i>Pengajuan peminjaman diterima</i></small>
+                            </div>
+                            <div class="me-2">
+                                <div class="btn btn-sm text-white p-1 mt-2 rounded bg-danger">
+                                    tolak
+                                </div> : <small><i>Pengajuan peminjaman ditolak</i></small>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <!-- Modal -->
@@ -54,6 +76,7 @@
                                         <th>Keperluan</th>
                                         <th>Status</th>
                                         <th>Pesan/Alasan</th>
+                                        <th>Foto KTP</th>
                                         <th style="width: 5%">Action</th>
                                     </tr>
                                 </thead>
@@ -72,10 +95,37 @@
                                         <td><?=$peminjaman['alamat'];?>
                                         <td><?=$peminjaman['keperluan'];?>
                                         <td>
-                                            <div
-                                                class="text-center text-white rounded bg-<?=$peminjaman['status_diterima'] == 'tunggu'?'warning':($peminjaman['status_diterima'] == 'terima'?'success':'danger');?>">
-                                                <?=$peminjaman['status_diterima'];?>
+                                            <a target="_blank"
+                                                href="<?=base_url('uploads/peminjaman/'.$peminjaman['foto_ktp']);?>">
+                                                <img src="<?= base_url('uploads/peminjaman/' . $peminjaman['foto_ktp']) ?>"
+                                                    width="100" alt="Foto KTP">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($peminjaman['status_diterima'])): ?>
+                                            <?php
+                                                $status = strtolower($peminjaman['status_diterima']);
+                                                switch ($status) {
+                                                    case 'verifikasi':
+                                                        $bg = 'warning';
+                                                        break;
+                                                    case 'tunggu':
+                                                        $bg = 'secondary';
+                                                        break;
+                                                    case 'terima':
+                                                        $bg = 'success';
+                                                        break;
+                                                    case 'tolak':
+                                                        $bg = 'danger';
+                                                        break;
+                                                    default:
+                                                        $bg = 'dark'; // fallback warna jika status tidak dikenal
+                                                }
+                                            ?>
+                                            <div class="text-center text-white p-1 rounded bg-<?= $bg; ?>">
+                                                <?= ucfirst($status); ?>
                                             </div>
+                                            <?php endif; ?>
                                         </td>
                                         <td class="text-wrap"><?=$peminjaman['pesan']??'-';?>
                                         <td>
@@ -88,7 +138,7 @@
                                                     <i class="fa fa-eye"> Detail</i>
                                                 </button>
                                                 <button type="button"
-                                                    <?=$peminjaman['status_diterima'] != 'tunggu'?'hidden':''?>
+                                                    <?=$peminjaman['status_diterima'] != 'verifikasi'?'hidden':''?>
                                                     data-batch_id="<?= $peminjaman['batch_id']; ?>"
                                                     data-bs-target="#deleteModal" data-bs-toggle="modal"
                                                     title="Hapus Barang Pinjam" class="btn btn-sm btn-danger"

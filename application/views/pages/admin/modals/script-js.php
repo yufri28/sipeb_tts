@@ -12,10 +12,12 @@ document.addEventListener("DOMContentLoaded", function() {
         // Get data attributes from the clicked button
         const idJenisBarang = button.getAttribute('data-id');
         const namaJenisBarang = button.getAttribute('data-nama');
+        const ketJenisBarang = button.getAttribute('data-ket');
 
         // Set values to the modal fields
         editJenisBarang.querySelector('#idJenisBarangEdit').value = idJenisBarang;
         editJenisBarang.querySelector('#namaJenisBarangEdit').value = namaJenisBarang;
+        editJenisBarang.querySelector('#ketJenisBarangEdit').value = ketJenisBarang;
 
     });
 
@@ -42,10 +44,12 @@ document.addEventListener("DOMContentLoaded", function() {
         // Get data attributes from the clicked button
         const idKlasifikasi = button.getAttribute('data-id');
         const namaKlasifikasi = button.getAttribute('data-nama');
+        const ketKlasifikasi = button.getAttribute('data-ket-kl');
 
         // Set values to the modal fields
         editKlasifikasi.querySelector('#idKlasifikasiEdit').value = idKlasifikasi;
         editKlasifikasi.querySelector('#namaKlasifikasiEdit').value = namaKlasifikasi;
+        editKlasifikasi.querySelector('#ketKlasifikasiEdit').value = ketKlasifikasi;
 
     });
 

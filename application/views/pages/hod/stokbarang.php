@@ -32,7 +32,6 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Kode Barang</th>
                                         <th>Jenis Barang</th>
                                         <th>Stok Masuk</th>
                                         <th>Stok Terkini</th>
@@ -46,7 +45,6 @@
                                 <tfoot>
                                     <tr>
                                         <th></th>
-                                        <th>Kode Barang</th>
                                         <th>Jenis Barang</th>
                                         <th>Stok Masuk</th>
                                         <th>Stok Terkini</th>
@@ -61,9 +59,6 @@
                                     <?php foreach ($stok as $key => $value):?>
                                     <tr>
                                         <td><?=$i++?>.</td>
-                                        <!-- kode barang: BRGKlasifikasi IdSumberIDIDJenisBarang  -->
-                                        <td>BRG<?=$value['klasifikasi_id'];?><?=$value['sumber_id'];?><?=$value['id_jenisbarang'];?>
-                                        </td>
                                         <td><?=$value['nama_jenisbarang'];?></td>
                                         <td><?=$value['jumlah'];?></td>
                                         <td><?=$value['stok_terkini'];?></td>
@@ -71,7 +66,7 @@
                                         <td><?=$value['tahun'];?></td>
                                         <td><?=$value['nama_sumber'];?></td>
                                         <td>
-                                            <a href="<?=base_url("stokbarang/cek_kondisi/".$value['id_stok']);?>"
+                                            <a href="<?=base_url("hodaccess/cek_kondisi/".$value['id_stok']);?>"
                                                 title="Cek Kondisi Stok" class="btn btn-primary btn-sm"
                                                 data-original-title="Cek Kondisi Stok">Cek Kondisi</i>
                                             </a>

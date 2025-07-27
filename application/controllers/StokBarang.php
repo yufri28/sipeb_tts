@@ -46,6 +46,60 @@ class StokBarang extends CI_Controller {
 		}
 	}
 
+	public function editfoto() {
+		
+		$id = htmlspecialchars($this->input->post('id_kondisi_terkini'));
+		// Ambil data bencana berdasarkan ID
+		$dataKondisi = $this->stokmodel->cek_kondisi_terkini_byid($id);
+		
+		// Konfigurasi upload
+		$config['upload_path'] = FCPATH.'uploads/kondisi/';
+		$config['allowed_types'] = 'jpg|jpeg|png';
+	
+		$this->upload->initialize($config);
+		
+		$fotoKondisi = $dataKondisi[0]['foto_kondisi']; // Tetap gunakan file lama jika tidak diupload
+		if (!empty($_FILES['foto_kondisi']['name'])) {
+			if (!$this->upload->do_upload('foto_kondisi')) {
+				
+				$this->session->set_flashdata('error', $this->upload->display_errors());
+				redirect(base_url('stokbarang/cek_kondisi/'.$dataKondisi[0]['stok_id']));
+			} else {
+				
+				// Hapus file lama
+				if (file_exists($config['upload_path'] . $fotoKondisi)) {
+					unlink($config['upload_path'] . $fotoKondisi);
+				}
+	
+				// Upload file baru
+				$dataFotoKondisi = $this->upload->data();
+				$originalFileName = $dataFotoKondisi['file_name'];
+				$fileExtension = $dataFotoKondisi['file_ext'];
+				$encryptedFileName =  md5(uniqid(time() . $originalFileName, true)) . $fileExtension;
+				rename($dataFotoKondisi['full_path'], $config['upload_path'] . $encryptedFileName);
+				$fotoKondisi = $encryptedFileName;
+				// Simpan data ke database, dengan file baru jika diupload, atau tetap menggunakan file lama jika tidak diupload
+				$data = array(
+					'foto_kondisi' => $fotoKondisi
+				);
+			
+				// Update data ke database
+				if ($this->stokmodel->update_kondisi($id, $data)) {
+					$this->session->set_flashdata('success', 'Foto kondisi berhasil diperbarui.');
+				} else {
+					$this->session->set_flashdata('error', 'Terjadi kesalahan, foto kondisi gagal diperbarui.');
+				}
+			}
+		}else {
+			$this->session->set_flashdata('error', 'Terjadi kesalahan, file foto kosong.');
+		}
+	
+	
+	
+		// Redirect ke halaman
+		redirect(base_url('stokbarang/cek_kondisi/'.$dataKondisi[0]['stok_id']));
+	}
+
 	public function get_data_kondisi_by_id($id) {
         $kondisi = $this->stokmodel->get_kondisi_by_barang_id($id);
         // Cek apakah data berhasil ditemukan

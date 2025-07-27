@@ -25,6 +25,23 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
+                    <div class="container">
+                        <div class="d-block">
+                            <label>Keterangan: </label>
+                            <div class="me-2">
+                                verifikasi: <small><i>Menunggu verifikasi data oleh admin</i></small>
+                            </div>
+                            <div class="me-2">
+                                tunggu : <small><i>Menunggu persetujuan</i></small>
+                            </div>
+                            <div class="me-2">
+                                terima : <small><i>Pengajuan peminjaman diterima</i></small>
+                            </div>
+                            <div class="me-2">
+                                tolak : <small><i>Pengajuan peminjaman ditolak</i></small>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <!-- Modal -->
                         <div class="table-responsive">
@@ -49,6 +66,7 @@
                                 <tbody>
                                     <?php $i = 1;?>
                                     <?php foreach ($data_peminjaman as $key => $peminjaman) :?>
+                                    <?php if($peminjaman['status_diterima'] != 'verifikasi'):?>
                                     <tr>
                                         <td><?=$i++;?>.</td>
                                         <td><?= date('d-m-Y', strtotime($peminjaman['tanggal_pengajuan'])); ?></td>
@@ -61,10 +79,27 @@
                                         <td><?=$peminjaman['alamat'];?>
                                         <td><?=$peminjaman['keperluan'];?>
                                         <td>
-                                            <div
-                                                class="text-center text-white rounded bg-<?=$peminjaman['status_diterima'] == 'tunggu'?'warning':($peminjaman['status_diterima'] == 'terima'?'success':'danger');?>">
-                                                <?=$peminjaman['status_diterima'];?>
-                                            </div>
+                                            <?php
+                                                $status = strtolower($peminjaman['status_diterima']);
+                                                switch ($status) {
+                                                    case 'verifikasi':
+                                                        $bg = 'warning';
+                                                        break;
+                                                    case 'tunggu':
+                                                        $bg = 'secondary';
+                                                        break;
+                                                    case 'terima':
+                                                        $bg = 'success';
+                                                        break;
+                                                    case 'tolak':
+                                                        $bg = 'danger';
+                                                        break;
+                                                    default:
+                                                        $bg = 'dark'; // fallback warna jika status tidak dikenal
+                                                }
+                                            ?>
+
+                                            <?= ucfirst($status); ?>
                                         </td>
                                         <td class="text-wrap"><?=$peminjaman['pesan']??'-';?>
                                         <td>
@@ -97,6 +132,7 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <?php endif;?>
                                     <?php endforeach;?>
                                 </tbody>
                             </table>

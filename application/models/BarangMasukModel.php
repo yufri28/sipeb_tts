@@ -8,7 +8,7 @@ class BarangMasukModel extends CI_Model {
 
     // Mengambil semua data dari tabel stok dan join dengan master_jenis_barang
     public function get_join_all_data() {
-        $this->db->select('stok.*, master_jenis_barang.nama_jenisbarang, master_sumber.nama_sumber');
+        $this->db->select('stok.*, master_jenis_barang.nama_jenisbarang, master_jenis_barang.id_jenisbarang, master_sumber.nama_sumber');
         $this->db->from('stok');
         $this->db->join('master_jenis_barang', 'stok.jenis_barang_id = master_jenis_barang.id_jenisbarang', 'left'); // Left join
         $this->db->join('master_sumber', 'stok.sumber_id = master_sumber.id_sumber', 'left'); // Left join

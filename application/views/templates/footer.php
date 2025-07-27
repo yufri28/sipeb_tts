@@ -107,6 +107,14 @@
 <!-- <script src="<?=base_url("assets/js/demo.js");?>"></script> -->
 <!-- Tambahkan Dashboard-js ke posisi ini -->
 
+
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- Alerts -->
@@ -154,6 +162,153 @@ $(document).ready(function() {
         pageLength: 5,
         scrollX: true,
         screenY: true,
+        dom: 'Bfrtip', // Tambahkan tombol di atas tabel
+        buttons: [{
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-success',
+                text: '<i class="fa fa-file-excel"></i> Export to Excel',
+                title: 'Stok Barang - Sistem Informasi Pendataan Barang - BPBD Kab TTS',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+
+        ],
+        initComplete: function() {
+            this.api()
+                .columns()
+                .every(function() {
+                    var column = this;
+                    var select = $(
+                            '<select class="form-select"><option value=""></option></select>'
+                        )
+                        .appendTo($(column.footer()).empty())
+                        .on("change", function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+                            column
+                                .search(val ? "^" + val + "$" : "", true, false)
+                                .draw();
+                        });
+
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function(d, j) {
+                            select.append(
+                                '<option value="' + d + '">' + d + "</option>"
+                            );
+                        });
+                });
+        },
+    });
+    $("#multi-filter-select-pem").DataTable({
+        pageLength: 5,
+        scrollX: true,
+        screenY: true,
+        dom: 'Bfrtip', // Tambahkan tombol di atas tabel
+        buttons: [{
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-success',
+                text: '<i class="fa fa-file-excel"></i> Export to Excel',
+                title: 'Peminjaman Barang - Sistem Informasi Pendataan Barang - BPBD Kab TTS',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                }
+            },
+
+        ],
+        initComplete: function() {
+            this.api()
+                .columns()
+                .every(function() {
+                    var column = this;
+                    var select = $(
+                            '<select class="form-select"><option value=""></option></select>'
+                        )
+                        .appendTo($(column.footer()).empty())
+                        .on("change", function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+                            column
+                                .search(val ? "^" + val + "$" : "", true, false)
+                                .draw();
+                        });
+
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function(d, j) {
+                            select.append(
+                                '<option value="' + d + '">' + d + "</option>"
+                            );
+                        });
+                });
+        },
+    });
+    $("#multi-filter-select-mas").DataTable({
+        pageLength: 5,
+        scrollX: true,
+        screenY: true,
+        dom: 'Bfrtip', // Tambahkan tombol di atas tabel
+        buttons: [{
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-success',
+                text: '<i class="fa fa-file-excel"></i> Export to Excel',
+                title: 'Barang Masuk - Sistem Informasi Pendataan Barang - BPBD Kab TTS',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 8]
+                }
+            },
+
+        ],
+        initComplete: function() {
+            this.api()
+                .columns()
+                .every(function() {
+                    var column = this;
+                    var select = $(
+                            '<select class="form-select"><option value=""></option></select>'
+                        )
+                        .appendTo($(column.footer()).empty())
+                        .on("change", function() {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+                            column
+                                .search(val ? "^" + val + "$" : "", true, false)
+                                .draw();
+                        });
+
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function(d, j) {
+                            select.append(
+                                '<option value="' + d + '">' + d + "</option>"
+                            );
+                        });
+                });
+        },
+    });
+    $("#multi-filter-select-kel").DataTable({
+        pageLength: 5,
+        scrollX: true,
+        screenY: true,
+        dom: 'Bfrtip', // Tambahkan tombol di atas tabel
+        buttons: [{
+                extend: 'excelHtml5',
+                className: 'btn btn-sm btn-success',
+                text: '<i class="fa fa-file-excel"></i> Export to Excel',
+                title: 'Barang Keluar - Sistem Informasi Pendataan Barang - BPBD Kab TTS',
+                exportOptions: {
+                    columns: ':not(:last-child)'
+                }
+            },
+
+        ],
         initComplete: function() {
             this.api()
                 .columns()

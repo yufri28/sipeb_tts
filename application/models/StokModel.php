@@ -31,12 +31,23 @@ class StokModel extends CI_Model {
 
     // Mengambil data berdasarkan ID
     public function cek_kondisi_terkini($id) {
-        $this->db->select('kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
+        $this->db->select('kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini, kondisi_terkini.foto_kondisi, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
         $this->db->from('kondisi_terkini');
         $this->db->join('master_kondisi', 'master_kondisi.id_kondisi = kondisi_terkini.kondisi_logpal_id', 'left'); // Left join
         $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
         $this->db->join('master_jenis_barang', 'master_jenis_barang.id_jenisbarang = stok.jenis_barang_id', 'left'); // Left join
         $this->db->where('kondisi_terkini.stok_id', $id);
+        return $this->db->get()->result_array();
+    }
+
+    // Mengambil data berdasarkan ID
+    public function cek_kondisi_terkini_byid($id) {
+        $this->db->select('kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini, kondisi_terkini.stok_id, kondisi_terkini.foto_kondisi, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
+        $this->db->from('kondisi_terkini');
+        $this->db->join('master_kondisi', 'master_kondisi.id_kondisi = kondisi_terkini.kondisi_logpal_id', 'left'); // Left join
+        $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
+        $this->db->join('master_jenis_barang', 'master_jenis_barang.id_jenisbarang = stok.jenis_barang_id', 'left'); // Left join
+        $this->db->where('kondisi_terkini.id_kondisi_terkini', $id);
         return $this->db->get()->result_array();
     }
 
@@ -46,6 +57,12 @@ class StokModel extends CI_Model {
         $this->db->where('stok_id', $stok_id);
         $query = $this->db->get();
         return $query->result_array(); // Mengembalikan array kondisi
+    }
+
+    public function update_kondisi($id_kondisi_terkini, $data)
+    {
+        $this->db->where('id_kondisi_terkini', $id_kondisi_terkini);
+        return $this->db->update('kondisi_terkini', $data);
     }
 
     // Menghapus data berdasarkan ID

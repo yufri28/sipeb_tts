@@ -21,6 +21,10 @@
                                     placeholder="nama jenis barang..." name="nama" />
                                 <input required type="hidden" name="tabel" value="master_jenis_barang">
                             </div>
+                            <div class="form-group form-group-default">
+                                <label>Keterangan Tambahan</label>
+                                <textarea class="form-control" name="keterangan_tambahan"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -58,6 +62,11 @@
                                     placeholder="nama jenis barang..." name="nama" />
                                 <input required type="hidden" name="tabel" value="master_jenis_barang">
                                 <input required type="hidden" name="id" id="idJenisBarangEdit">
+                            </div>
+                            <div class="form-group form-group-default">
+                                <label>Keterangan Tambahan</label>
+                                <textarea class="form-control" id="ketJenisBarangEdit"
+                                    name="keterangan_tambahan"></textarea>
                             </div>
                         </div>
                     </div>
@@ -132,6 +141,11 @@
                                     placeholder="nama klasifikasi..." name="nama" />
                                 <input required type="hidden" name="tabel" value="klasifikasi">
                             </div>
+                            <div class="form-group form-group-default">
+                                <label>Keterangan Tambahan</label>
+                                <textarea class="form-control" id="ketJenisBarangEdit"
+                                    name="keterangan_tambahan"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -169,6 +183,11 @@
                                     placeholder="nama klasifikasi..." name="nama" />
                                 <input required type="hidden" name="tabel" value="klasifikasi">
                                 <input required type="hidden" name="id" id="idKlasifikasiEdit">
+                            </div>
+                            <div class="form-group form-group-default">
+                                <label>Keterangan Tambahan</label>
+                                <textarea class="form-control" id="ketKlasifikasiEdit"
+                                    name="keterangan_tambahan"></textarea>
                             </div>
                         </div>
                     </div>

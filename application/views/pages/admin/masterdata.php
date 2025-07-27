@@ -44,6 +44,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Jenis Barang</th>
+                                        <th>Keterangan Tambahan</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -60,10 +61,51 @@
                                         <td><?= $i++?>. </td>
                                         <td><?=$jenis['nama_jenisbarang'];?></td>
                                         <td>
+                                            <?php
+                                                $text = $jenis['keterangan_tambahan']??'-';
+                                                $shortText = strlen($text) > 20 ? substr($text, 0, 20) . '...' : $text;
+                                            ?>
+                                            <?php if (strlen($text) > 20): ?>
+                                            <span data-bs-toggle="modal"
+                                                data-bs-target="#modalKet<?=$jenis['id_jenisbarang'];?>"
+                                                style="cursor:pointer; color:blue; text-decoration:underline;">
+                                                <?=$shortText;?>
+                                            </span>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalKet<?=$jenis['id_jenisbarang'];?>"
+                                                tabindex="-1"
+                                                aria-labelledby="modalKetLabel<?=$jenis['id_jenisbarang'];?>"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-scrollable">
+                                                    <!-- modal-lg untuk ukuran lebih besar -->
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="modalKetLabel<?=$jenis['id_jenisbarang'];?>">
+                                                                Keterangan
+                                                                Tambahan Jenis Barang</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="text-wrap"
+                                                                style="word-wrap: break-word; white-space: pre-wrap;">
+                                                                <?=nl2br(htmlspecialchars($text));?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php else: ?>
+                                            <?=$text;?>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
                                             <div class="form-button-action">
                                                 <button type="button" data-bs-toggle="modal"
                                                     data-nama="<?=$jenis['nama_jenisbarang'];?>"
                                                     data-id="<?=$jenis['id_jenisbarang'];?>"
+                                                    data-ket="<?=$jenis['keterangan_tambahan'];?>"
                                                     data-bs-target="#editJenisBarang" title="Edit Data Barang"
                                                     class="btn btn-link btn-primary btn-lg"
                                                     data-original-title="Edit Data Barang">
@@ -109,6 +151,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Klasifikasi</th>
+                                        <th>Keterangan Tambahan</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -125,10 +168,51 @@
                                         <td><?= $i++?>. </td>
                                         <td><?=$value['nama_klasifikasi'];?></td>
                                         <td>
+                                            <?php
+                                                $text = $value['keterangan_tambahan']??'-';
+                                                $shortText = strlen($text) > 20 ? substr($text, 0, 20) . '...' : $text;
+                                            ?>
+                                            <?php if (strlen($text) > 20): ?>
+                                            <span data-bs-toggle="modal"
+                                                data-bs-target="#modalKet<?=$value['id_klasifikasi'];?>"
+                                                style="cursor:pointer; color:blue; text-decoration:underline;">
+                                                <?=$shortText;?>
+                                            </span>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalKet<?=$value['id_klasifikasi'];?>"
+                                                tabindex="-1"
+                                                aria-labelledby="modalKetLabel<?=$value['id_klasifikasi'];?>"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-scrollable">
+                                                    <!-- modal-lg untuk ukuran lebih besar -->
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="modalKetLabel<?=$value['id_klasifikasi'];?>">
+                                                                Keterangan
+                                                                Tambahan Klasifikas</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="text-wrap"
+                                                                style="word-wrap: break-word; white-space: pre-wrap;">
+                                                                <?=nl2br(htmlspecialchars($text));?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php else: ?>
+                                            <?=$text;?>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
                                             <div class="form-button-action">
                                                 <button type="button" data-bs-toggle="modal"
                                                     data-nama="<?=$value['nama_klasifikasi'];?>"
                                                     data-id="<?=$value['id_klasifikasi'];?>"
+                                                    data-ket-kl="<?=$value['keterangan_tambahan'];?>"
                                                     data-bs-target="#editKlasifikasi" title="Edit Klasifikasi"
                                                     class="btn btn-link btn-primary btn-lg"
                                                     data-original-title="Edit Klasifikasi">
@@ -342,7 +426,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <!-- <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
                         <div class="card-header">
@@ -405,7 +489,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

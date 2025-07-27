@@ -131,7 +131,7 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <table id="multi-filter-select" class="display nowrap table table-striped table-hover">
+                            <table id="multi-filter-select-kel" class="display nowrap table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <th>No</th>

@@ -97,7 +97,26 @@ class UserAccess extends CI_Controller {
 	}
 
 	public function add()
-	{		
+	{
+		$upload_dir = FCPATH . 'uploads/peminjaman/';
+		$config['upload_path']   = $upload_dir;
+		$config['allowed_types'] = 'jpg|jpeg|png';
+
+		$this->upload->initialize($config);
+	
+		// Proses upload bukti lapor
+		if (!$this->upload->do_upload('foto_ktp')) {
+			$this->session->set_flashdata('error', $this->upload->display_errors());
+			redirect(base_url('useraccess/peminjaman'));
+		} else {
+			$fotoKTP = $this->upload->data();
+			$originalFileName = $fotoKTP['file_name']; // Nama asli file yang diunggah
+			$fileExtension = $fotoKTP['file_ext']; // Ekstensi file
+			$encryptedFileName = md5(uniqid(time() . $originalFileName, true)) . $fileExtension; // Enkripsi nama file
+			rename($fotoKTP['full_path'], $config['upload_path'] . $encryptedFileName); // Ubah nama file
+			$foto_ktp_name = $encryptedFileName; // Simpan nama file terenkripsi
+		}
+
 		// Ambil data dari form
 		$tanggal_pinjam = htmlspecialchars($this->input->post('tanggal_pinjam'));
 		$tanggal_kembali = htmlspecialchars($this->input->post('tanggal_kembali'));
@@ -107,7 +126,7 @@ class UserAccess extends CI_Controller {
 		$keperluan = htmlspecialchars($this->input->post('keperluan'));
 		$batch_id = generate_uuid(); // Buat UUID batch baru
 		$user_id = $this->session->userdata('id_auth');
-		
+
 		// Data untuk disimpan
 		$data_peminjaman = [
 			'tanggal_pengajuan' => date('Y-m-d'),
@@ -118,8 +137,9 @@ class UserAccess extends CI_Controller {
 			'alamat' => $alamat,
 			'keperluan' => $keperluan,
 			'batch_id' => $batch_id,
-			'status_diterima' => 'tunggu',
-			'user_id' => $user_id
+			'status_diterima' => 'verifikasi',
+			'user_id' => $user_id,
+			'foto_ktp' => $foto_ktp_name
 		];
 
 		// Mulai transaksi database
@@ -130,26 +150,21 @@ class UserAccess extends CI_Controller {
 			$id_kondisi_terkini = $this->input->post('id_kondisi_terkini[]');
 			$jumlah = preg_replace('/[^0-9,]/', '', $this->input->post('jumlah'));
 			$jumlahArray = explode(',', $jumlah);
-			$jumlah = htmlspecialchars($jumlah); // Mengamankan input
 
 			// Periksa setiap barang yang dipilih
 			foreach ($id_kondisi_terkini as $i => $kondisi_terkini_id) {
-				// Pastikan jumlah barang valid
-				if ($jumlahArray[$i] <= 0) {
+				if (!isset($jumlahArray[$i]) || $jumlahArray[$i] <= 0) {
 					$this->session->set_flashdata('error', 'Jumlah barang tidak valid.');
 					redirect('useraccess/peminjaman');
 				}
 
-				// Data untuk tabel barang_pinjam
 				$data_barang_keluar = [
 					'jumlah' => $jumlahArray[$i],
 					'kondisi_terkini_id' => $kondisi_terkini_id,
 					'batch_id' => $batch_id
 				];
 
-				// Simpan data barang pinjam
 				if (!$this->peminjamanmodel->insert_data('barang_pinjam', $data_barang_keluar)) {
-					// Jika insert barang gagal, rollback
 					$this->db->trans_rollback();
 					$this->session->set_flashdata('error', 'Gagal menyimpan data barang pinjam.');
 					redirect('useraccess/peminjaman');
@@ -165,15 +180,93 @@ class UserAccess extends CI_Controller {
 				$this->session->set_flashdata('success', 'Data berhasil disimpan!');
 			}
 		} else {
-			// Jika insert peminjaman gagal, rollback
 			$this->db->trans_rollback();
 			$this->session->set_flashdata('error', 'Gagal menyimpan data peminjaman.');
 		}
 
-		// Redirect ke halaman peminjaman
 		redirect('useraccess/peminjaman');
-		
 	}
+
+
+	// ============== restore ===========
+	// public function add()
+	// {		
+	// 	// Ambil data dari form
+	// 	$tanggal_pinjam = htmlspecialchars($this->input->post('tanggal_pinjam'));
+	// 	$tanggal_kembali = htmlspecialchars($this->input->post('tanggal_kembali'));
+	// 	$nama_penanggungjawab = htmlspecialchars($this->input->post('nama_penanggungjawab'));
+	// 	$no_hp = htmlspecialchars($this->input->post('no_hp'));
+	// 	$alamat = htmlspecialchars($this->input->post('alamat'));
+	// 	$keperluan = htmlspecialchars($this->input->post('keperluan'));
+	// 	$batch_id = generate_uuid(); // Buat UUID batch baru
+	// 	$user_id = $this->session->userdata('id_auth');
+		
+	// 	// Data untuk disimpan
+	// 	$data_peminjaman = [
+	// 		'tanggal_pengajuan' => date('Y-m-d'),
+	// 		'tanggal_pinjam' => $tanggal_pinjam,
+	// 		'tanggal_kembali' => $tanggal_kembali,
+	// 		'nama_penanggungjawab' => $nama_penanggungjawab,
+	// 		'no_hp' => $no_hp,
+	// 		'alamat' => $alamat,
+	// 		'keperluan' => $keperluan,
+	// 		'batch_id' => $batch_id,
+	// 		'status_diterima' => 'tunggu',
+	// 		'user_id' => $user_id
+	// 	];
+
+	// 	// Mulai transaksi database
+	// 	$this->db->trans_start();
+
+	// 	// Insert data peminjaman
+	// 	if ($this->peminjamanmodel->insert_data('peminjaman', $data_peminjaman)) {
+	// 		$id_kondisi_terkini = $this->input->post('id_kondisi_terkini[]');
+	// 		$jumlah = preg_replace('/[^0-9,]/', '', $this->input->post('jumlah'));
+	// 		$jumlahArray = explode(',', $jumlah);
+	// 		$jumlah = htmlspecialchars($jumlah); // Mengamankan input
+
+	// 		// Periksa setiap barang yang dipilih
+	// 		foreach ($id_kondisi_terkini as $i => $kondisi_terkini_id) {
+	// 			// Pastikan jumlah barang valid
+	// 			if ($jumlahArray[$i] <= 0) {
+	// 				$this->session->set_flashdata('error', 'Jumlah barang tidak valid.');
+	// 				redirect('useraccess/peminjaman');
+	// 			}
+
+	// 			// Data untuk tabel barang_pinjam
+	// 			$data_barang_keluar = [
+	// 				'jumlah' => $jumlahArray[$i],
+	// 				'kondisi_terkini_id' => $kondisi_terkini_id,
+	// 				'batch_id' => $batch_id
+	// 			];
+
+	// 			// Simpan data barang pinjam
+	// 			if (!$this->peminjamanmodel->insert_data('barang_pinjam', $data_barang_keluar)) {
+	// 				// Jika insert barang gagal, rollback
+	// 				$this->db->trans_rollback();
+	// 				$this->session->set_flashdata('error', 'Gagal menyimpan data barang pinjam.');
+	// 				redirect('useraccess/peminjaman');
+	// 			}
+	// 		}
+
+	// 		// Selesaikan transaksi
+	// 		$this->db->trans_complete();
+
+	// 		if ($this->db->trans_status() === FALSE) {
+	// 			$this->session->set_flashdata('error', 'Transaksi gagal, perubahan dibatalkan.');
+	// 		} else {
+	// 			$this->session->set_flashdata('success', 'Data berhasil disimpan!');
+	// 		}
+	// 	} else {
+	// 		// Jika insert peminjaman gagal, rollback
+	// 		$this->db->trans_rollback();
+	// 		$this->session->set_flashdata('error', 'Gagal menyimpan data peminjaman.');
+	// 	}
+
+	// 	// Redirect ke halaman peminjaman
+	// 	redirect('useraccess/peminjaman');
+		
+	// }
 
 	public function delete_peminjaman()
 	{
