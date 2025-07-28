@@ -6,7 +6,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-6 col-md-3">
+            <div class="col-sm-6 col-md-4">
                 <div class="card card-stats card-round">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -25,7 +25,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-md-3">
+            <!-- <div class="col-sm-6 col-md-3">
                 <div class="card card-stats card-round">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -43,8 +43,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-6 col-md-3">
+            </div> -->
+            <div class="col-sm-6 col-md-4">
                 <div class="card card-stats card-round">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -56,14 +56,15 @@
                             <div class="col col-stats ms-3 ms-sm-0">
                                 <div class="numbers">
                                     <p class="card-category">Total Barang Masuk</p>
-                                    <h4 class="card-title"><?= $jumlah_masuk_perbulan['barang_masuk_bulan_ini'] ?></h4>
+                                    <h4 class="card-title"><?= $jumlah_masuk_perbulan['barang_masuk_bulan_ini']??0 ?>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-md-3">
+            <div class="col-sm-6 col-md-4">
                 <div class="card card-stats card-round">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -75,7 +76,7 @@
                             <div class="col col-stats ms-3 ms-sm-0">
                                 <div class="numbers">
                                     <p class="card-category">Total Barang Keluar</p>
-                                    <h4 class="card-title"><?= $jumlah_keluar_perbulan['barang_keluar_bulan_ini'] ?>
+                                    <h4 class="card-title"><?= $jumlah_keluar_perbulan['barang_keluar_bulan_ini']??0 ?>
                                     </h4>
                                 </div>
                             </div>
@@ -95,7 +96,7 @@
                         </div>
                         <div class="card-body pb-0">
                             <div class="mb-4 mt-2">
-                                <h1 class="text-center"><?= $barang_masuk_bulan_ini ?></h1>
+                                <h1 class="text-center"><?= $barang_masuk_bulan_ini??0 ?></h1>
                             </div>
                         </div>
                     </div>
@@ -108,11 +109,11 @@
                         </div>
                         <div class="card-body pb-0">
                             <div class="mb-4 mt-2">
-                                <h1 class="text-center"><?= $barang_keluar_bulan_ini ?></h1>
+                                <h1 class="text-center"><?= $barang_keluar_bulan_ini??0 ?></h1>
                             </div>
                         </div>
                     </div>
-                    <div class="card card-warning card-round">
+                    <!-- <div class="card card-warning card-round">
                         <div class="card-header">
                             <div class="card-head-row">
                                 <div class="card-title">Bencana Bulan Ini</div>
@@ -124,7 +125,7 @@
                                 <h1 class="text-center"><?= $bencana_bulan_ini; ?></h1>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="col-md-8">
                     <div class="card card-round">
