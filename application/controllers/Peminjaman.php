@@ -150,12 +150,13 @@ class Peminjaman extends CI_Controller {
 		 elseif ($status == 'tolak') {
 			// Update peminjaman status menjadi tolak
 			$this->db->where('batch_id', $batch_id);
-			$this->db->update('peminjaman', ['status_diterima' => 'tolak', 'pesan' => $pesan]);
+			$this->db->update('peminjaman', ['status_diterima' => 'tolak', 'status_peminjaman' => 'selesai', 'pesan' => $pesan]);
 		}
 
 		// Redirect kembali ke halaman peminjaman
 		redirect('peminjaman');
 	}
 
+	
 	
 }

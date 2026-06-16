@@ -16,10 +16,13 @@ class KondisiTerkiniModel extends CI_Model {
         }
     }
 
-    // Mengambil data berdasarkan ID
+    // Mengambil data berdasarkan ID diubah ke detail_kondisi
     public function get_data_by_id($id) {
-        return $this->db->get_where('kondisi_terkini', ['id_kondisi_terkini' => $id])->row_array();
+        return $this->db->get_where('detail_kondisi', ['id_detail' => $id])->row_array();
     }
+    // public function get_data_by_id($id) {
+    //     return $this->db->get_where('kondisi_terkini', ['id_kondisi_terkini' => $id])->row_array();
+    // }
 
     // Mengambil data berdasarkan ID
     public function get_data_kondisi_by_id($id) {
@@ -53,6 +56,26 @@ class KondisiTerkiniModel extends CI_Model {
         }
     }
 
+    // update status tersedia atau tidak
+    public function update_status($id_detail = null, $status = 'Tersedia'){
+       
+        if($id_detail != null){
+            $this->db->set('status', $status);
+            // Update detail_kondisi berdasarkan id_kondisi_terkini
+            $this->db->where('id_detail', $id_detail);
+            $this->db->update('detail_kondisi');
+
+            // Cek apakah ada baris yang di-update
+            if ($this->db->affected_rows() > 0) {
+                return true; // Menandakan bahwa pembaruan berhasil
+            } else {
+                return false; // Menandakan tidak ada perubahan (misalnya ID tidak ditemukan)
+            }
+        }else {
+            return false; // Menandakan tidak ada perubahan (misalnya ID tidak ditemukan)
+        }
+    }
+
     public function update_jumlah($id, $jumlah, $action = 'kurangi')
     {
         if ($action === 'kurangi') {
@@ -77,7 +100,6 @@ class KondisiTerkiniModel extends CI_Model {
         }
     }
 
-
     // public function update_jumlah($id, $jumlah)
     // {
     //     // Mengurangi kondisi_terkini dengan jumlah yang diberikan
@@ -91,8 +113,6 @@ class KondisiTerkiniModel extends CI_Model {
     //         return false; // Menandakan bahwa tidak ada perubahan (misalnya ID tidak ditemukan)
     //     }
     // }
-    
-
 
 }
 

@@ -17,7 +17,8 @@ class BarangKeluarModel extends CI_Model {
     public function get_all_barang_keluar($batch_id){
         $this->db->select('barang_keluar.*, stok.id_stok, kondisi_terkini.id_kondisi_terkini, kondisi_terkini.kondisi_logpal_id, master_jenis_barang.nama_jenisbarang, master_kondisi.nama_kondisi, master_satuan.nama_satuan, master_sumber.nama_sumber');
         $this->db->from('barang_keluar');
-        $this->db->join('kondisi_terkini', 'kondisi_terkini.id_kondisi_terkini = barang_keluar.kondisi_terkini_id', 'left');
+        $this->db->join('detail_kondisi', 'detail_kondisi.id_detail = barang_keluar.kondisi_terkini_id', 'left');
+        $this->db->join('kondisi_terkini', 'kondisi_terkini.id_kondisi_terkini = detail_kondisi.kondisi_terkini_id', 'left');
         $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left');
         $this->db->join('master_jenis_barang', 'master_jenis_barang.id_jenisbarang = stok.jenis_barang_id', 'left');
         $this->db->join('master_kondisi', 'master_kondisi.id_kondisi = kondisi_terkini.kondisi_logpal_id', 'left');
@@ -42,6 +43,26 @@ class BarangKeluarModel extends CI_Model {
 		$query = $this->db->get();
 		return $query->result_array();
 	}
+
+    public function get_data_detail_terkini()
+    {
+        $query = $this->db->query("
+			SELECT stok.id_stok, stok.tahun, stok.keterangan_tambahan, stok.tanggal_masuk,
+				master_jenis_barang.nama_jenisbarang,
+				detail_kondisi.foto, kondisi_terkini.id_kondisi_terkini, detail_kondisi.id_detail, 
+                detail_kondisi.kode, detail_kondisi.status,
+                kondisi_terkini.stok_terkini
+			FROM stok 
+			LEFT JOIN master_jenis_barang ON master_jenis_barang.id_jenisbarang = stok.jenis_barang_id
+			LEFT JOIN kondisi_terkini ON kondisi_terkini.stok_id = stok.id_stok
+			JOIN detail_kondisi ON detail_kondisi.kondisi_terkini_id = kondisi_terkini.id_kondisi_terkini
+			WHERE stok.masuk_stok = 'sudah'
+		");
+
+		$data = $query->result_array();
+       
+        return $data;
+    }
 
     public function get_data_serah_terima($batch_id)
     {
@@ -108,6 +129,22 @@ class BarangKeluarModel extends CI_Model {
     {
         return $this->db->get_where('barang_keluar', ['id_barang_keluar' => $id_barang_keluar])->row_array();
     }
+
+    public function get_fkp(){
+        $this->db->select('foto_kondisi_peminjaman.*');
+        $this->db->from('foto_kondisi_peminjaman');
+        $this->db->join('peminjaman', 'peminjaman.batch_id = foto_kondisi_peminjaman.batch_id', 'left');
+         
+        return $this->db->get()->result_array();
+    }
+
+    public function get_foto_peminjaman($batch_id)
+    {
+        return $this->db->get_where('foto_kondisi_peminjaman', [
+            'batch_id' => $batch_id
+        ])->result_array();
+    }
+
 
     // public function delete_data($id_barang_keluar)
     // {

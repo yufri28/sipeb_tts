@@ -37,6 +37,7 @@ class UserAccess extends CI_Controller {
 		$peminjaman_diterima = $this->peminjamanmodel->get_jumlah_peminjaman('terima',$this->session->userdata('id_auth'));
 		$peminjaman_ditolak = $this->peminjamanmodel->get_jumlah_peminjaman('tolak',$this->session->userdata('id_auth'));
 		$peminjaman_tunggu = $this->peminjamanmodel->get_jumlah_peminjaman('tunggu',$this->session->userdata('id_auth'));
+		$peminjaman_verifikasi = $this->peminjamanmodel->get_jumlah_peminjaman('verifikasi',$this->session->userdata('id_auth'));
 		
 	
 		$data = [
@@ -52,6 +53,7 @@ class UserAccess extends CI_Controller {
 			'statistik_barang_keluar' => $statistik_barang_keluar,
 			'peminjaman_ditolak' => $peminjaman_ditolak,
 			'peminjaman_diterima' => $peminjaman_diterima,
+			'peminjaman_verifikasi' => $peminjaman_verifikasi,
 			'peminjaman_tunggu' => $peminjaman_tunggu
 		];
 		
@@ -88,10 +90,43 @@ class UserAccess extends CI_Controller {
 			'klasifikasi' => $klasifikasi,
 			'barang_masuk' => $barang_masuk
 		];
-
 		
 		$this->load->view('templates/header',$data);
 		$this->load->view('pages/user/peminjaman');
+		$this->load->view('templates/footer');
+		$this->load->view('pages/user/modals/peminjaman');
+	}
+
+	public function peminjaman_barang(){
+		
+		$jenis_bencana = $this->masterdatamodel->get_all_data('master_jenis_bencana');
+		$kondisi = $this->masterdatamodel->get_all_data('master_kondisi');
+		$satuan = $this->masterdatamodel->get_all_data('master_satuan');
+		$sumber = $this->masterdatamodel->get_all_data('master_sumber');
+		$klasifikasi = $this->masterdatamodel->get_all_data('klasifikasi');
+		$barang_masuk = $this->barangmasukmodel->get_join_all_data();
+		
+		$data_stok_barang = $this->barangkeluarmodel->get_data_detail_terkini();
+		$data_peminjaman = $this->peminjamanmodel->get_join_pinjaman($this->session->userdata('id_auth'));
+		$barang_pinjam = $this->peminjamanmodel->get_barang_pinjam($this->session->userdata('id_auth'));
+		
+		
+		$data = [
+			'menu' => 'peminjaman',
+			'data_peminjaman' => $data_peminjaman,
+			'data_stok_barang' => $data_stok_barang,
+			'jenis_bencana' => $jenis_bencana,
+			'barang_pinjam' => $barang_pinjam,
+			'kondisi' => $kondisi,
+			'satuan' => $satuan,
+			'sumber' => $sumber,
+			'klasifikasi' => $klasifikasi,
+			'barang_masuk' => $barang_masuk
+		];
+
+		
+		$this->load->view('templates/header',$data);
+		$this->load->view('pages/user/peminjaman_barang');
 		$this->load->view('templates/footer');
 		$this->load->view('pages/user/modals/peminjaman');
 	}
@@ -187,7 +222,6 @@ class UserAccess extends CI_Controller {
 		redirect('useraccess/peminjaman');
 	}
 
-
 	// ============== restore ===========
 	// public function add()
 	// {		
@@ -267,6 +301,342 @@ class UserAccess extends CI_Controller {
 	// 	redirect('useraccess/peminjaman');
 		
 	// }
+
+	// =============== restore ==================
+	// public function save_add(){
+		
+	// 	$upload_dir = FCPATH . 'uploads/peminjaman/';
+	// 	$config['upload_path']   = $upload_dir;
+	// 	$config['allowed_types'] = 'jpg|jpeg|png';
+
+	// 	$this->upload->initialize($config);
+	
+	// 	// Proses upload bukti lapor
+	// 	if (!$this->upload->do_upload('foto_ktp')) {
+	// 		$this->session->set_flashdata('error', $this->upload->display_errors());
+	// 		redirect(base_url('useraccess/peminjaman'));
+	// 	} else {
+	// 		$fotoKTP = $this->upload->data();
+	// 		$originalFileName = $fotoKTP['file_name']; // Nama asli file yang diunggah
+	// 		$fileExtension = $fotoKTP['file_ext']; // Ekstensi file
+	// 		$encryptedFileName = md5(uniqid(time() . $originalFileName, true)) . $fileExtension; // Enkripsi nama file
+	// 		rename($fotoKTP['full_path'], $config['upload_path'] . $encryptedFileName); // Ubah nama file
+	// 		$foto_ktp_name = $encryptedFileName; // Simpan nama file terenkripsi
+	// 	}
+
+	// 	// Ambil data dari form
+	// 	$tanggal_pinjam = htmlspecialchars($this->input->post('tanggal_pinjam'));
+	// 	$tanggal_kembali = htmlspecialchars($this->input->post('tanggal_kembali'));
+	// 	$nama_penanggungjawab = htmlspecialchars($this->input->post('nama_penanggungjawab'));
+	// 	$no_hp = htmlspecialchars($this->input->post('no_hp'));
+	// 	$alamat = htmlspecialchars($this->input->post('alamat'));
+	// 	$keperluan = htmlspecialchars($this->input->post('keperluan'));
+	// 	$batch_id = generate_uuid(); // Buat UUID batch baru
+	// 	$user_id = $this->session->userdata('id_auth');
+
+	// 	// Data untuk disimpan
+	// 	$data_peminjaman = [
+	// 		'tanggal_pengajuan' => date('Y-m-d'),
+	// 		'tanggal_pinjam' => $tanggal_pinjam,
+	// 		'tanggal_kembali' => $tanggal_kembali,
+	// 		'nama_penanggungjawab' => $nama_penanggungjawab,
+	// 		'no_hp' => $no_hp,
+	// 		'alamat' => $alamat,
+	// 		'keperluan' => $keperluan,
+	// 		'batch_id' => $batch_id,
+	// 		'status_diterima' => 'verifikasi',
+	// 		'user_id' => $user_id,
+	// 		'foto_ktp' => $foto_ktp_name
+	// 	];
+	
+	// 	// Mulai transaksi database
+	// 	$this->db->trans_start();
+
+	// 	// Insert data peminjaman
+	// 	if ($this->peminjamanmodel->insert_data('peminjaman', $data_peminjaman)) {
+	// 		$id_kondisi_terkini = $this->input->post('product_id[]');
+	// 		// $jumlah = preg_replace('/[^0-9,]/', '', $this->input->post('jumlah'));
+	// 		// $jumlahArray = explode(',', $jumlah);
+
+	// 		// Periksa setiap barang yang dipilih
+	// 		foreach ($id_kondisi_terkini as $i => $kondisi_terkini_id) {
+	// 			// if (!isset($jumlahArray[$i]) || $jumlahArray[$i] <= 0) {
+	// 			// 	$this->session->set_flashdata('error', 'Jumlah barang tidak valid.');
+	// 			// 	redirect('useraccess/peminjaman');
+	// 			// }
+
+	// 			$data_barang_keluar = [
+	// 				// 'jumlah' => $jumlahArray[$i],
+	// 				'jumlah' => 1,
+	// 				'kondisi_terkini_id' => $kondisi_terkini_id,
+	// 				'batch_id' => $batch_id
+	// 			];
+
+	// 			if (!$this->peminjamanmodel->insert_data('barang_pinjam', $data_barang_keluar)) {
+	// 				$this->db->trans_rollback();
+	// 				$this->session->set_flashdata('error', 'Gagal menyimpan data barang pinjam.');
+	// 				redirect('useraccess/peminjaman');
+	// 			}
+	// 		}
+
+	// 		// Selesaikan transaksi
+	// 		$this->db->trans_complete();
+
+	// 		if ($this->db->trans_status() === FALSE) {
+	// 			$this->session->set_flashdata('error', 'Transaksi gagal, perubahan dibatalkan.');
+	// 		} else {
+	// 			$this->session->set_flashdata('success', 'Data berhasil disimpan!');
+	// 		}
+	// 	} else {
+	// 		$this->db->trans_rollback();
+	// 		$this->session->set_flashdata('error', 'Gagal menyimpan data peminjaman.');
+	// 	}
+
+	// 	redirect('useraccess/peminjaman');
+	// 	// Simpan data peminjaman dan update data barang (Tersedia/Tidak Tersedia)
+	// }
+	// public function save_add(){
+		
+	// 	$upload_dir = FCPATH . 'uploads/peminjaman/';
+	// 	$config['upload_path']   = $upload_dir;
+	// 	$config['allowed_types'] = 'jpg|jpeg|png';
+
+	// 	$this->upload->initialize($config);
+	
+	// 	// Proses upload bukti lapor
+	// 	if (!$this->upload->do_upload('foto_ktp')) {
+	// 		$this->session->set_flashdata('error', $this->upload->display_errors());
+	// 		redirect(base_url('useraccess/peminjaman'));
+	// 	} else {
+	// 		$fotoKTP = $this->upload->data();
+	// 		$originalFileName = $fotoKTP['file_name']; // Nama asli file yang diunggah
+	// 		$fileExtension = $fotoKTP['file_ext']; // Ekstensi file
+	// 		$encryptedFileName = md5(uniqid(time() . $originalFileName, true)) . $fileExtension; // Enkripsi nama file
+	// 		rename($fotoKTP['full_path'], $config['upload_path'] . $encryptedFileName); // Ubah nama file
+	// 		$foto_ktp_name = $encryptedFileName; // Simpan nama file terenkripsi
+	// 	}
+
+	// 	// Ambil data dari form
+	// 	$tanggal_pinjam = htmlspecialchars($this->input->post('tanggal_pinjam'));
+	// 	$tanggal_kembali = htmlspecialchars($this->input->post('tanggal_kembali'));
+	// 	$nama_penanggungjawab = htmlspecialchars($this->input->post('nama_penanggungjawab'));
+	// 	$no_hp = htmlspecialchars($this->input->post('no_hp'));
+	// 	$alamat = htmlspecialchars($this->input->post('alamat'));
+	// 	$keperluan = htmlspecialchars($this->input->post('keperluan'));
+	// 	$batch_id = generate_uuid(); // Buat UUID batch baru
+	// 	$user_id = $this->session->userdata('id_auth');
+
+	// 	// Data untuk disimpan
+	// 	$data_peminjaman = [
+	// 		'tanggal_pengajuan' => date('Y-m-d'),
+	// 		'tanggal_pinjam' => $tanggal_pinjam,
+	// 		'tanggal_kembali' => $tanggal_kembali,
+	// 		'nama_penanggungjawab' => $nama_penanggungjawab,
+	// 		'no_hp' => $no_hp,
+	// 		'alamat' => $alamat,
+	// 		'keperluan' => $keperluan,
+	// 		'batch_id' => $batch_id,
+	// 		'status_diterima' => 'verifikasi',
+	// 		'user_id' => $user_id,
+	// 		'foto_ktp' => $foto_ktp_name
+	// 	];
+	
+	// 	// Mulai transaksi database
+	// 	$this->db->trans_start();
+
+	// 	// Insert data peminjaman
+	// 	if ($this->peminjamanmodel->insert_data('peminjaman', $data_peminjaman)) {
+	// 		$id_kondisi_terkini = $this->input->post('product_id[]');
+	// 		// $jumlah = preg_replace('/[^0-9,]/', '', $this->input->post('jumlah'));
+	// 		// $jumlahArray = explode(',', $jumlah);
+
+	// 		$kode_conflict_list = []; // Untuk menyimpan kode-kode yang konflik
+
+	// 		foreach ($id_kondisi_terkini as $kondisi_terkini_id) {
+	// 			// CEK APAKAH BARANG SUDAH DIPINJAM DALAM RENTANG TANGGAL YANG BENTROK
+	// 			$conflicts = $this->db->select('bp.*, dk.kode, p.tanggal_pinjam as pinjam_lama, p.tanggal_kembali as kembali_lama')
+	// 				->from('barang_pinjam bp')
+	// 				->join('peminjaman p', 'bp.batch_id = p.batch_id')
+	// 				->join('detail_kondisi dk', 'dk.id_detail = bp.kondisi_terkini_id', 'left')
+	// 				->where('bp.kondisi_terkini_id', $kondisi_terkini_id)
+	// 				->where('p.tanggal_pinjam <=', $tanggal_kembali)
+	// 				->where('p.tanggal_kembali >=', $tanggal_pinjam)
+	// 				->get()
+	// 				->result();
+
+	// 			if (!empty($conflicts)) {
+	// 				foreach ($conflicts as $conflict) {
+	// 					$kode_conflict_list[] = $conflict->kode;
+	// 				}
+	// 			}
+	// 		}
+
+	// 		// Cek jika ada konflik
+	// 		if (!empty($kode_conflict_list)) {
+	// 			$list_kode = implode(', ', $kode_conflict_list);
+	// 			$this->session->set_flashdata('error', 'Barang dengan kode berikut masih dalam masa peminjaman antara tanggal ' . $tanggal_pinjam . ' hingga ' . $tanggal_kembali . ': ' . $list_kode);
+	// 			redirect('useraccess/peminjaman');
+	// 		}
+
+	// 		// Jika tidak ada konflik, lanjut simpan
+	// 		foreach ($id_kondisi_terkini as $kondisi_terkini_id) {
+	// 			$data_barang_keluar = [
+	// 				'jumlah' => 1,
+	// 				'kondisi_terkini_id' => $kondisi_terkini_id,
+	// 				'batch_id' => $batch_id
+	// 			];
+
+	// 			if (!$this->peminjamanmodel->insert_data('barang_pinjam', $data_barang_keluar)) {
+	// 				$this->db->trans_rollback();
+	// 				$this->session->set_flashdata('error', 'Gagal menyimpan data barang pinjam.');
+	// 				redirect('useraccess/peminjaman');
+	// 			}
+	// 		}
+
+	// 		// Selesaikan transaksi
+	// 		$this->db->trans_complete();
+
+	// 		if ($this->db->trans_status() === FALSE) {
+	// 			$this->session->set_flashdata('error', 'Transaksi gagal, perubahan dibatalkan.');
+	// 		} else {
+	// 			$this->session->set_flashdata('success', 'Data berhasil disimpan!');
+	// 		}
+	// 	} else {
+	// 		$this->db->trans_rollback();
+	// 		$this->session->set_flashdata('error', 'Gagal menyimpan data peminjaman.');
+	// 	}
+
+	// 	redirect('useraccess/peminjaman');
+	// 	// Simpan data peminjaman dan update data barang (Tersedia/Tidak Tersedia)
+	// }
+
+	public function save_add()
+	{
+		// Ambil data dari form
+		$tanggal_pinjam = htmlspecialchars($this->input->post('tanggal_pinjam'));
+		$tanggal_kembali = htmlspecialchars($this->input->post('tanggal_kembali'));
+		$nama_penanggungjawab = htmlspecialchars($this->input->post('nama_penanggungjawab'));
+		$no_hp = htmlspecialchars($this->input->post('no_hp'));
+		$alamat = htmlspecialchars($this->input->post('alamat'));
+		$keperluan = htmlspecialchars($this->input->post('keperluan'));
+		$batch_id = generate_uuid();
+		$user_id = $this->session->userdata('id_auth');
+
+		$id_kondisi_terkini = $this->input->post('product_id[]');
+		$kode_conflict_list = [];
+
+		// Validasi konflik barang
+		foreach ($id_kondisi_terkini as $kondisi_terkini_id) {
+			// $conflicts = $this->db->select('bp.*, dk.kode, p.tanggal_pinjam, p.tanggal_kembali')
+			// 	->from('barang_pinjam bp')
+			// 	->join('peminjaman p', 'bp.batch_id = p.batch_id')
+			// 	->join('detail_kondisi dk', 'dk.id_detail = bp.kondisi_terkini_id', 'left')
+			// 	->where('bp.kondisi_terkini_id', $kondisi_terkini_id)
+			// 	->where('p.tanggal_pinjam <=', $tanggal_kembali)
+			// 	->where('p.tanggal_kembali >=', $tanggal_pinjam)
+			// 	->where('p.status_diterima', 'terima') // atau
+			// 	->where('p.status_diterima', 'verifikasi') // atau
+			// 	->where('p.status_diterima', 'tunggu') // atau
+			// 	->where('p.status_peminjaman', 'belum')
+			// 	->get()
+			// 	->result();
+			$conflicts = $this->db->select('bp.*, dk.kode, p.tanggal_pinjam, p.tanggal_kembali')
+			->from('barang_pinjam bp')
+			->join('peminjaman p', 'bp.batch_id = p.batch_id')
+			->join('detail_kondisi dk', 'dk.id_detail = bp.kondisi_terkini_id', 'left')
+			->where('bp.kondisi_terkini_id', $kondisi_terkini_id)
+			->where('p.tanggal_pinjam <=', $tanggal_kembali)
+			->where('p.tanggal_kembali >=', $tanggal_pinjam)
+			->group_start()
+				->where_in('p.status_diterima', ['terima', 'verifikasi', 'tunggu'])
+				->where('p.status_peminjaman', 'belum')
+			->group_end()
+			->get()
+			->result();
+
+			foreach ($conflicts as $conflict) {
+				$kode_conflict_list[] = $conflict->kode;
+			}
+		}
+
+		if (!empty($kode_conflict_list)) {
+			$list_kode = implode(', ', $kode_conflict_list);
+			$this->session->set_flashdata('error', 'Barang dengan kode berikut masih dalam masa peminjaman antara tanggal ' . $tanggal_pinjam . ' hingga ' . $tanggal_kembali . ': ' . $list_kode);
+			redirect('useraccess/peminjaman');
+		}
+
+		// Data peminjaman
+		$data_peminjaman = [
+			'tanggal_pengajuan' => date('Y-m-d'),
+			'tanggal_pinjam' => $tanggal_pinjam,
+			'tanggal_kembali' => $tanggal_kembali,
+			'nama_penanggungjawab' => $nama_penanggungjawab,
+			'no_hp' => $no_hp,
+			'alamat' => $alamat,
+			'keperluan' => $keperluan,
+			'batch_id' => $batch_id,
+			'status_diterima' => 'verifikasi',
+			'user_id' => $user_id,
+			'foto_ktp' => null // Belum upload
+		];
+
+		// Mulai transaksi
+		$this->db->trans_start();
+
+		if ($this->peminjamanmodel->insert_data('peminjaman', $data_peminjaman)) {
+			foreach ($id_kondisi_terkini as $kondisi_terkini_id) {
+				$data_barang_keluar = [
+					'jumlah' => 1,
+					'kondisi_terkini_id' => $kondisi_terkini_id,
+					'batch_id' => $batch_id
+				];
+
+				if (!$this->peminjamanmodel->insert_data('barang_pinjam', $data_barang_keluar)) {
+					$this->db->trans_rollback();
+					$this->session->set_flashdata('error', 'Gagal menyimpan data barang pinjam.');
+					redirect('useraccess/peminjaman');
+				}
+			}
+
+			$this->db->trans_complete();
+
+			if ($this->db->trans_status() === FALSE) {
+				$this->session->set_flashdata('error', 'Transaksi gagal, perubahan dibatalkan.');
+				redirect('useraccess/peminjaman');
+			}
+
+			// ---------------------------
+			// Baru Proses Upload KTP
+			// ---------------------------
+			$upload_dir = FCPATH . 'uploads/peminjaman/';
+			$config['upload_path'] = $upload_dir;
+			$config['allowed_types'] = 'jpg|jpeg|png';
+
+			$this->upload->initialize($config);
+
+			if (!$this->upload->do_upload('foto_ktp')) {
+				$this->session->set_flashdata('error', 'Data disimpan, namun gagal mengupload foto KTP: ' . $this->upload->display_errors());
+			} else {
+				$fotoKTP = $this->upload->data();
+				$originalFileName = $fotoKTP['file_name'];
+				$fileExtension = $fotoKTP['file_ext'];
+				$encryptedFileName = md5(uniqid(time() . $originalFileName, true)) . $fileExtension;
+				rename($fotoKTP['full_path'], $upload_dir . $encryptedFileName);
+
+				// Update nama file ke tabel peminjaman
+				$this->db->where('batch_id', $batch_id)
+						->update('peminjaman', ['foto_ktp' => $encryptedFileName]);
+			}
+
+			$this->session->set_flashdata('success', 'Data berhasil disimpan!');
+		} else {
+			$this->db->trans_rollback();
+			$this->session->set_flashdata('error', 'Gagal menyimpan data peminjaman.');
+		}
+
+		redirect('useraccess/peminjaman');
+	}
+
 
 	public function delete_peminjaman()
 	{

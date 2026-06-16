@@ -137,7 +137,7 @@
                                                 data-nama="<?=$peminjaman['name'];?>"
                                                 data-tanggal="<?=date('d-m-Y',strtotime($peminjaman['tanggal_pengajuan']));?>"
                                                 data-bs-target="#accModal" data-bs-toggle="modal"
-                                                title="Terima Peminjaman" class="btn btn-sm btn-primary me-1"
+                                                title="Terima Peminjaman" class="btn btn-sm btn-success me-1"
                                                 data-original-title="Terima Peminjaman">
                                                 <i class="fa fa-check"> Valid</i>
                                             </button>

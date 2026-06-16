@@ -14,6 +14,7 @@ class StokModel extends CI_Model {
         $this->db->join('master_sumber', 'stok.sumber_id = master_sumber.id_sumber', 'left'); // Left join
         $this->db->join('master_satuan', 'stok.satuan_id = master_satuan.id_satuan', 'left'); // Left join
         $this->db->join('kondisi_terkini', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
+        $this->db->join('klasifikasi', 'stok.klasifikasi_id = klasifikasi.id_klasifikasi', 'left'); // Left join
         $this->db->group_by('stok.id_stok');
         return $this->db->get()->result_array();
     }
@@ -21,6 +22,12 @@ class StokModel extends CI_Model {
     // Mengambil data berdasarkan ID
     public function get_data_by_id($id) {
         return $this->db->get_where('stok', ['id_stok' => $id])->row_array();
+    }
+
+    public function get_data_kondisi_bystok($id) {
+        $this->db->select('stok.*, kondisi_terkini.id_kondisi_terkini, kondisi_terkini.kondisi_logpal_id, kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini');
+        $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
+        return $this->db->get_where('kondisi_terkini', ['stok_id' => $id])->result_array();
     }
 
     public function get_total_stok_terkini() {
@@ -31,7 +38,7 @@ class StokModel extends CI_Model {
 
     // Mengambil data berdasarkan ID
     public function cek_kondisi_terkini($id) {
-        $this->db->select('kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini, kondisi_terkini.foto_kondisi, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
+        $this->db->select('kondisi_terkini.stok_masuk, kondisi_terkini.kondisi_logpal_id, stok.klasifikasi_id, stok.sumber_id,  stok.jenis_barang_id, kondisi_terkini.stok_terkini, kondisi_terkini.foto_kondisi, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
         $this->db->from('kondisi_terkini');
         $this->db->join('master_kondisi', 'master_kondisi.id_kondisi = kondisi_terkini.kondisi_logpal_id', 'left'); // Left join
         $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
@@ -51,12 +58,64 @@ class StokModel extends CI_Model {
         return $this->db->get()->result_array();
     }
 
+    public function cek_detail_kondisi_terkini($id) {
+        $this->db->select('detail_kondisi.*, kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini, kondisi_terkini.stok_id, kondisi_terkini.foto_kondisi, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
+        $this->db->from('detail_kondisi');
+        $this->db->join('kondisi_terkini', 'detail_kondisi.kondisi_terkini_id = kondisi_terkini.id_kondisi_terkini', 'left'); // Left join
+        $this->db->join('master_kondisi', 'master_kondisi.id_kondisi = kondisi_terkini.kondisi_logpal_id', 'left'); // Left join
+        $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
+        $this->db->join('master_jenis_barang', 'master_jenis_barang.id_jenisbarang = stok.jenis_barang_id', 'left'); // Left join
+        $this->db->where('detail_kondisi.id_detail', $id);
+        return $this->db->get()->result_array();
+    }
+
+    public function detail_kondisi_terkini($id) {
+        $this->db->select('detail_kondisi.*, kondisi_terkini.stok_masuk, kondisi_terkini.stok_terkini, kondisi_terkini.stok_id, kondisi_terkini.foto_kondisi, kondisi_terkini.id_kondisi_terkini, master_kondisi.nama_kondisi, master_jenis_barang.nama_jenisbarang');
+        $this->db->from('detail_kondisi');
+        $this->db->join('kondisi_terkini', 'detail_kondisi.kondisi_terkini_id = kondisi_terkini.id_kondisi_terkini', 'left'); // Left join
+        $this->db->join('master_kondisi', 'master_kondisi.id_kondisi = kondisi_terkini.kondisi_logpal_id', 'left'); // Left join
+        $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left'); // Left join
+        $this->db->join('master_jenis_barang', 'master_jenis_barang.id_jenisbarang = stok.jenis_barang_id', 'left'); // Left join
+        $this->db->where('detail_kondisi.kondisi_terkini_id', $id);
+        return $this->db->get()->result_array();
+    }
+
+    // Memasukkan data ke tabel
+    public function insert_detail_kondisi($data) {
+        // Insert data ke database
+        if ($this->db->insert('detail_kondisi', $data)) {
+            return true;  // Berhasil insert
+        } else {
+            return false; // Gagal insert
+        }
+    }
+
+    public function is_kode_exist($kode)
+    {
+        return $this->db->where('kode', $kode)->count_all_results('detail_kondisi') > 0;
+    }
+
+    // stokmodel.php
+    public function is_data_synchronized($stok_id)
+    {
+        $this->db->join('kondisi_terkini', 'kondisi_terkini.id_kondisi_terkini = detail_kondisi.kondisi_terkini_id', 'left'); // Left join
+        return $this->db
+            ->where('kondisi_terkini.stok_id', $stok_id)
+            ->count_all_results('detail_kondisi') > 0;
+    }
+
     public function get_kondisi_by_barang_id($stok_id) {
         $this->db->select('*');
         $this->db->from('kondisi_terkini');
         $this->db->where('stok_id', $stok_id);
         $query = $this->db->get();
         return $query->result_array(); // Mengembalikan array kondisi
+    }
+
+    public function update_detail_kondisi($id_detail, $data)
+    {
+        $this->db->where('id_detail', $id_detail);
+        return $this->db->update('detail_kondisi', $data);
     }
 
     public function update_kondisi($id_kondisi_terkini, $data)

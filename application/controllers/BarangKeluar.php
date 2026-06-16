@@ -299,6 +299,10 @@ class BarangKeluar extends CI_Controller {
 		$data_peminjaman = $this->peminjamanmodel->get_pinjaman('terima');
 		
 		$data_barang_keluar = $this->barangkeluarmodel->get_all_barang_keluar($batch_id);
+		$data_fkp = $this->barangkeluarmodel->get_fkp();
+		$foto_lama = $this->barangkeluarmodel->get_foto_peminjaman($batch_id);
+		
+
 		if(empty($data_barang_keluar)){
 			$this->session->set_flashdata('error', 'Data tidak ditemukan untuk Batch ID ' . $batch_id);
 			redirect('barangkeluar');
@@ -307,13 +311,88 @@ class BarangKeluar extends CI_Controller {
 		$data = [
 			'menu' => 'barangkeluar',
 			'data_barang_keluar' => $data_barang_keluar,
-			'data_peminjaman' => $data_peminjaman
+			'data_peminjaman' => $data_peminjaman,
+			'foto_lama' => $foto_lama
 		];
 		$this->load->view('templates/header', $data);
 		$this->load->view('pages/admin/detail_peminjaman');
 		$this->load->view('templates/footer');		
 		$this->load->view('pages/admin/modals/indexmodal');
 	}
+
+	public function hapus_foto_peminjaman($id_fkp)
+	{
+		$this->db->trans_start();
+
+		// Cari data foto
+		$foto = $this->db->get_where('foto_kondisi_peminjaman', ['id_fkp' => $id_fkp])->row_array();
+
+		if ($foto) {
+			// Hapus file fisik
+			$path = FCPATH . 'uploads/fkp/' . $foto['fkp'];
+			if (file_exists($path)) {
+				unlink($path);
+			}
+
+			// Hapus record di database
+			$this->db->delete('foto_kondisi_peminjaman', ['id_fkp' => $id_fkp]);
+
+			$this->db->trans_complete();
+
+			if ($this->db->trans_status()) {
+				echo json_encode(['status' => 'success']);
+				return;
+			}
+		}
+
+		echo json_encode(['status' => 'error']);
+	}
+
+	// ================== Restore ==========================
+	// public function update_peminjaman()
+	// {
+	// 	$tanggal_pinjam = htmlspecialchars($this->input->post('tanggal_pinjam'));
+	// 	$nama_pihak_pertama = htmlspecialchars($this->input->post('nama_pihak_pertama'));
+	// 	$jabatan_pihak1 = htmlspecialchars($this->input->post('jabatan_pihak_pertama'));
+	// 	$nama_pihak2 = htmlspecialchars($this->input->post('nama_pihak_kedua'));
+	// 	$no_hp = htmlspecialchars($this->input->post('no_hp'));
+	// 	$kepala_pelaksana = htmlspecialchars($this->input->post('kepala_pelaksana'));
+	// 	$jabatan_pelaksana = htmlspecialchars($this->input->post('jabatan_pelaksana'));
+	// 	$nip_pelaksana = htmlspecialchars($this->input->post('nip_pelaksana'));
+	// 	$batch_id = htmlspecialchars($this->input->post('batch_id'));
+
+	// 	// Fetch existing serah_terima data based on the ID
+	// 	$cek_data_peminjaman = $this->peminjamanmodel->get_data_peminjaman($batch_id);
+
+	// 	if (!$cek_data_peminjaman) {
+	// 		$this->session->set_flashdata('error', 'Data Serah Terima tidak ditemukan.');
+	// 		redirect('barangkeluar/detail_peminjaman/'.$batch_id);
+	// 		return;
+	// 	}
+		
+	// 	$data = [
+	// 		'tanggal_pinjam' => $tanggal_pinjam,
+	// 		'nama_pihak_pertama' => $nama_pihak_pertama,
+	// 		'jabatan_pihak_pertama' => $jabatan_pihak1,
+	// 		'nama_penanggungjawab' => $nama_pihak2,
+	// 		'no_hp' => $no_hp,
+	// 		'kepala_pelaksana' => $kepala_pelaksana,
+	// 		'jabatan_pelaksana' => $jabatan_pelaksana,
+	// 		'nip_pelaksana' => $nip_pelaksana
+	// 	];
+
+	// 	// Update the data in the database
+	// 	$update_peminjaman = $this->peminjamanmodel->update_data_peminjaman($batch_id, $data);
+
+	// 	// tambahkan upload foto-foto tersebut ke dalam path FCPATH.'uploads/fkp/' dan disimpan ke dalam tabel foto_kondisi_peminjaman (id_fpk INT 11 AUTOINCREAMENT), (fkp VARCHAR 255 untuk nama foto), (batch_id) 
+	// 	if ($update_peminjaman) {
+	// 		$this->session->set_flashdata('success', 'Berhasil data peminjaman.');
+	// 	} else {
+	// 		$this->session->set_flashdata('error', 'Gagal data peminjaman.');
+	// 	}
+
+	// 	redirect('barangkeluar/detail_peminjaman/'.$batch_id);
+	// }
 
 	public function update_peminjaman()
 	{
@@ -327,15 +406,56 @@ class BarangKeluar extends CI_Controller {
 		$nip_pelaksana = htmlspecialchars($this->input->post('nip_pelaksana'));
 		$batch_id = htmlspecialchars($this->input->post('batch_id'));
 
-		// Fetch existing serah_terima data based on the ID
+		// Cek data
 		$cek_data_peminjaman = $this->peminjamanmodel->get_data_peminjaman($batch_id);
-
 		if (!$cek_data_peminjaman) {
 			$this->session->set_flashdata('error', 'Data Serah Terima tidak ditemukan.');
 			redirect('barangkeluar/detail_peminjaman/'.$batch_id);
 			return;
 		}
-		
+
+		$uploaded_files = []; // simpan nama file yang berhasil diupload
+		$path = FCPATH . 'uploads/fkp/';
+		if (!file_exists($path)) {
+			mkdir($path, 0777, true);
+		}
+
+		$this->load->library('upload');
+
+		// ====== 1. Upload semua foto dulu ======
+		if (!empty($_FILES['foto']['name'][0])) {
+			foreach ($_FILES['foto']['name'] as $key => $name) {
+				$_FILES['file']['name'] = $_FILES['foto']['name'][$key];
+				$_FILES['file']['type'] = $_FILES['foto']['type'][$key];
+				$_FILES['file']['tmp_name'] = $_FILES['foto']['tmp_name'][$key];
+				$_FILES['file']['error'] = $_FILES['foto']['error'][$key];
+				$_FILES['file']['size'] = $_FILES['foto']['size'][$key];
+
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'jpg|jpeg|png|gif';
+				// $config['max_size'] = 2048;
+				$config['encrypt_name'] = TRUE;
+
+				$this->upload->initialize($config);
+
+				if ($this->upload->do_upload('file')) {
+					$uploadData = $this->upload->data();
+					$uploaded_files[] = $uploadData['file_name'];
+				} else {
+					// Kalau gagal upload → hapus foto yang sudah berhasil diupload
+					foreach ($uploaded_files as $file) {
+						@unlink($path . $file);
+					}
+					$this->session->set_flashdata('error', 'Gagal upload foto: ' . $this->upload->display_errors('', ''));
+					redirect('barangkeluar/detail_peminjaman/'.$batch_id);
+					return;
+				}
+			}
+		}
+
+		// ====== 2. Simpan data + foto ke DB dalam transaksi ======
+		$this->db->trans_begin();
+
 		$data = [
 			'tanggal_pinjam' => $tanggal_pinjam,
 			'nama_pihak_pertama' => $nama_pihak_pertama,
@@ -347,13 +467,27 @@ class BarangKeluar extends CI_Controller {
 			'nip_pelaksana' => $nip_pelaksana
 		];
 
-		// Update the data in the database
-		$update_peminjaman = $this->peminjamanmodel->update_data_peminjaman($batch_id, $data);
+		$this->peminjamanmodel->update_data_peminjaman($batch_id, $data);
 
-		if ($update_peminjaman) {
-			$this->session->set_flashdata('success', 'Berhasil data peminjaman.');
+		// Simpan foto ke tabel
+		foreach ($uploaded_files as $filename) {
+			$this->db->insert('foto_kondisi_peminjaman', [
+				'fkp' => $filename,
+				'batch_id' => $batch_id
+			]);
+		}
+
+		// Commit atau rollback
+		if ($this->db->trans_status() === FALSE) {
+			// Rollback dan hapus foto dari folder
+			$this->db->trans_rollback();
+			foreach ($uploaded_files as $file) {
+				@unlink($path . $file);
+			}
+			$this->session->set_flashdata('error', 'Gagal menyimpan data peminjaman.');
 		} else {
-			$this->session->set_flashdata('error', 'Gagal data peminjaman.');
+			$this->db->trans_commit();
+			$this->session->set_flashdata('success', 'Berhasil memperbarui data peminjaman.');
 		}
 
 		redirect('barangkeluar/detail_peminjaman/'.$batch_id);
@@ -499,13 +633,14 @@ class BarangKeluar extends CI_Controller {
 
 		foreach ($barang_keluar as $item) {
 			// Update stok barang
-			if (!$this->update_stok_barang($item)) {
+			if (!$this->update_status($item['kondisi_terkini_id'])) {
 				// Rollback transaksi jika gagal
 				$this->db->trans_rollback();
 				$this->session->set_flashdata('error', 'Gagal mengembalikan stok barang.');
 				return redirect('barangkeluar/detail_peminjaman/' . $batch_id);
 			}
 		}
+
 
 		// Jika semua operasi berhasil, commit transaksi
 		if ($this->db->trans_status() === FALSE) {
@@ -515,6 +650,7 @@ class BarangKeluar extends CI_Controller {
 			// Update status peminjaman menjadi selesai
 			$update_data = ['status_peminjaman' => 'selesai'];
 			if ($this->peminjamanmodel->update_data_peminjaman($batch_id, $update_data)) {
+				// $this->kondisiterkinimodel->update_status(,'Tersedia');
 				$this->db->trans_commit();
 				$this->session->set_flashdata('success', 'Konfirmasi peminjaman berhasil.');
 			} else {
@@ -527,6 +663,64 @@ class BarangKeluar extends CI_Controller {
 		redirect('barangkeluar');
 	}
 
+	// ===== Restore =======
+	// public function konfirmasi_selesai()
+	// {
+	// 	$batch_id = htmlspecialchars($this->input->post('batch_id'));
+
+	// 	// Fetch existing serah_terima data based on the ID
+	// 	$data_peminjaman = $this->peminjamanmodel->get_data_peminjaman($batch_id);
+
+	// 	// Jika data peminjaman tidak ditemukan, kembalikan ke halaman detail
+	// 	if (!$data_peminjaman) {
+	// 		$this->session->set_flashdata('error', 'Data Peminjaman tidak ditemukan.');
+	// 		return redirect('barangkeluar/detail_peminjaman/' . $batch_id);
+	// 	}
+
+	// 	// Ambil data barang keluar berdasarkan ID batch
+	// 	$barang_keluar = $this->barangkeluarmodel->get_barang_keluar_by_batch($batch_id);
+
+	// 	// Jika data barang keluar tidak ditemukan
+	// 	if (empty($barang_keluar)) {
+	// 		$this->session->set_flashdata('error', 'Data barang keluar tidak ditemukan!');
+	// 		return redirect('barangkeluar/detail_peminjaman/' . $batch_id);
+	// 	}
+
+	// 	// Mulai transaksi
+	// 	$this->db->trans_begin();
+
+	// 	foreach ($barang_keluar as $item) {
+	// 		// Update stok barang
+	// 		if (!$this->update_stok_barang($item)) {
+	// 			// Rollback transaksi jika gagal
+	// 			$this->db->trans_rollback();
+	// 			$this->session->set_flashdata('error', 'Gagal mengembalikan stok barang.');
+	// 			return redirect('barangkeluar/detail_peminjaman/' . $batch_id);
+	// 		}
+	// 	}
+
+
+	// 	// Jika semua operasi berhasil, commit transaksi
+	// 	if ($this->db->trans_status() === FALSE) {
+	// 		$this->db->trans_rollback();
+	// 		$this->session->set_flashdata('error', 'Terjadi kesalahan dalam transaksi.');
+	// 	} else {
+	// 		// Update status peminjaman menjadi selesai
+	// 		$update_data = ['status_peminjaman' => 'selesai'];
+	// 		if ($this->peminjamanmodel->update_data_peminjaman($batch_id, $update_data)) {
+	// 			// $this->kondisiterkinimodel->update_status(,'Tersedia');
+	// 			$this->db->trans_commit();
+	// 			$this->session->set_flashdata('success', 'Konfirmasi peminjaman berhasil.');
+	// 		} else {
+	// 			$this->db->trans_rollback();
+	// 			$this->session->set_flashdata('error', 'Gagal mengubah status peminjaman.');
+	// 		}
+	// 	}
+
+	// 	// Redirect kembali ke halaman detail peminjaman
+	// 	redirect('barangkeluar');
+	// }
+
 	private function update_stok_barang($item)
 	{
 		return $this->kondisiterkinimodel->update_jumlah(
@@ -534,6 +728,11 @@ class BarangKeluar extends CI_Controller {
 			$item['jumlah'], 
 			'tambah'
 		);
+	}
+
+	private function update_status($kondisi_terkini_id)
+	{
+		return $this->kondisiterkinimodel->update_status($kondisi_terkini_id, 'Tersedia');
 	}
 
 	

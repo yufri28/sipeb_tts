@@ -26,19 +26,20 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-
                         <div class="table-responsive">
                             <table id="multi-filter-select" class="display nowrap table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>Kode Barang</th>
+                                        <th>Klasifikasi</th>
                                         <th>Jenis Barang</th>
                                         <th>Stok Masuk</th>
                                         <th>Stok Terkini</th>
                                         <th>Satuan</th>
                                         <th>Tahun</th>
                                         <th>Sumber</th>
+                                        <th>Sync</th>
                                         <th style="width: 10%">Kondisi</th>
                                         <!-- <th style="width: 10%">Action</th> -->
                                     </tr>
@@ -47,13 +48,14 @@
                                     <tr>
                                         <th></th>
                                         <th>Kode Barang</th>
+                                        <th>Klasifikasi</th>
                                         <th>Jenis Barang</th>
                                         <th>Stok Masuk</th>
                                         <th>Stok Terkini</th>
                                         <th>Satuan</th>
                                         <th>Tahun</th>
                                         <th>Sumber</th>
-                                        <th>Kondisi</th>
+                                        <th>Sync</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
@@ -64,12 +66,18 @@
                                         <!-- kode barang: BRGKlasifikasi IdSumberIDIDJenisBarang  -->
                                         <td>BRG<?=$value['klasifikasi_id'];?><?=$value['sumber_id'];?><?=$value['id_jenisbarang'];?>
                                         </td>
+                                        <td><?=$value['nama_klasifikasi'];?></td>
                                         <td><?=$value['nama_jenisbarang'];?></td>
                                         <td><?=$value['jumlah'];?></td>
                                         <td><?=$value['stok_terkini'];?></td>
                                         <td><?=$value['nama_satuan'];?></td>
                                         <td><?=$value['tahun'];?></td>
                                         <td><?=$value['nama_sumber'];?></td>
+                                        <td>
+                                            <?=$this->stokmodel->is_data_synchronized($value['id_stok']) > 0
+                                            ? 'Sudah'
+                                            : 'Belum';?>
+                                        </td>
                                         <td>
                                             <a href="<?=base_url("stokbarang/cek_kondisi/".$value['id_stok']);?>"
                                                 title="Cek Kondisi Stok" class="btn btn-primary btn-sm"

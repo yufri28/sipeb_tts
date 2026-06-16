@@ -129,14 +129,23 @@ Swal.fire({
     confirmButtonText: 'OK'
 }).then(function(result) {
     if (result.isConfirmed) {
-        // window.location.href = '';
-        window.location.reload();
+        // Hapus localStorage jika ada formData
+        if (localStorage.getItem('formData')) {
+            localStorage.removeItem('formData');
+        }
+        if (localStorage.getItem('cart')) {
+            localStorage.removeItem('cart');
+        }
 
+        // Refresh halaman (atau bisa redirect ke halaman tertentu)
+        window.location.reload();
+        // window.location.href = '';
     }
 });
 </script>
-<?php $this->session->unset_userdata('success'); // Menghapus session setelah ditampilkan ?>
+<?php $this->session->unset_userdata('success'); ?>
 <?php endif; ?>
+
 
 <?php if ($this->session->flashdata('error')): ?>
 <script>
@@ -171,8 +180,22 @@ $(document).ready(function() {
                 exportOptions: {
                     columns: ':not(:last-child)'
                 }
+            }, {
+                className: 'btn btn-sm btn-info',
+                text: '<i class="fa fa-link"></i> Export per kondisi',
+                action: function(e, dt, node, config) {
+                    window.location.href =
+                        '<?=base_url('stokbarang/export_per_kondisi');?>'; // Ganti dengan link yang kamu mau
+                }
             },
-
+            {
+                className: 'btn btn-sm btn-primary text-white',
+                text: '<i class="fa fa-link"></i> Export per detail kondisi',
+                action: function(e, dt, node, config) {
+                    window.location.href =
+                        '<?=base_url('stokbarang/export_per_detail_kondisi');?>'; // Ganti dengan link tujuan
+                }
+            }
         ],
         initComplete: function() {
             this.api()

@@ -38,6 +38,20 @@
                 <div class="card card-warning card-round">
                     <div class="card-header">
                         <div class="card-head-row">
+                            <div class="card-title">Peminjaman Menunggu Verifikasi</div>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="mb-4 mt-2">
+                            <h1 class="text-center"><?= $peminjaman_verifikasi['jumlah'];?></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-warning card-round">
+                    <div class="card-header">
+                        <div class="card-head-row">
                             <div class="card-title">Peminjaman Menunggu Persetujuan</div>
                         </div>
                     </div>

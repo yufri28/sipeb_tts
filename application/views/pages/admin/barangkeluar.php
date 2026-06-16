@@ -33,11 +33,11 @@
                                     <i class="fa fa-plus"></i>
                                     Peminjaman
                                 </a>
-                                <button class="btn btn-primary btn-round" data-bs-toggle="modal"
+                                <!-- <button class="btn btn-primary btn-round" data-bs-toggle="modal"
                                     data-bs-target="#addModal">
                                     <i class="fa fa-plus"></i>
                                     Bantuan
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                     </div>

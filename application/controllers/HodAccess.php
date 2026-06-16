@@ -172,6 +172,7 @@ class HodAccess extends CI_Controller {
 		
 	}
 
+	// ============= Ubah dari kondisi terkini ke detail kondisi ======================
 	public function konfirmasi_peminjaman()
 	{
 		// Ambil ID barang pinjam dan status dari input yang sudah disanitasi
@@ -207,10 +208,6 @@ class HodAccess extends CI_Controller {
 					// Ambil stok dari kondisi_terkini
 					$stok_terkini = $this->kondisiterkinimodel->get_data_by_id($value['kondisi_terkini_id']);
 
-					// Cek apakah stok cukup
-					if ($stok_terkini < $value['jumlah']) {
-						throw new Exception('Stok tidak cukup, silakan sesuaikan permintaan sesuai stok yang tersedia.');
-					}
 
 					// Insert data ke barang keluar
 					$data_barang_keluar = [
@@ -224,8 +221,8 @@ class HodAccess extends CI_Controller {
 					// Simpan ke database
 					if ($this->barangkeluarmodel->insert_data($data_barang_keluar)) {
 						// Update stok
-						if (!$this->kondisiterkinimodel->update_jumlah($value['kondisi_terkini_id'], $value['jumlah'], 'kurangi')) {
-							throw new Exception('Gagal mengupdate jumlah stok.');
+						if (!$this->kondisiterkinimodel->update_status($value['kondisi_terkini_id'], 'Tidak Tersedia')) {
+							throw new Exception('Gagal mengupdate status stok.');
 						}
 					} else {
 						throw new Exception('Gagal menyimpan data barang keluar.');
@@ -261,12 +258,109 @@ class HodAccess extends CI_Controller {
 		} elseif ($status == 'tolak') {
 			// Update peminjaman status menjadi tolak
 			$this->db->where('batch_id', $batch_id);
-			$this->db->update('peminjaman', ['status_diterima' => 'tolak']);
+			$this->db->update('peminjaman', ['status_diterima' => 'tolak', 'status_peminjaman' => 'selesai']);
 		}
 
 		// Redirect kembali ke halaman peminjaman
 		redirect('hodaccess/peminjaman');
 	}
+
+	// =============== restore =================
+	// public function konfirmasi_peminjaman()
+	// {
+	// 	// Ambil ID barang pinjam dan status dari input yang sudah disanitasi
+	// 	$batch_id = $this->input->post('batch_id', true);
+	// 	$pesan = $this->input->post('pesan', true);
+	// 	$status = $this->input->post('status', true);
+
+	// 	// Pastikan batch_id ada
+	// 	if (empty($batch_id)) {
+	// 		$this->session->set_flashdata('error', 'Batch ID tidak valid!');
+	// 		redirect('hodaccess/peminjaman');
+	// 		return;
+	// 	}
+
+	// 	// Ambil data barang pinjam berdasarkan batch_id
+	// 	$barang_pinjam = $this->peminjamanmodel->get_barang_pinjam_by_batch($batch_id);
+
+	// 	// Cek apakah data barang pinjam ditemukan
+	// 	if (empty($barang_pinjam)) {
+	// 		$this->session->set_flashdata('error', 'Data barang pinjam tidak ditemukan!');
+	// 		redirect('hodaccess/peminjaman');
+	// 		return;
+	// 	}
+
+	// 	// Proses jika status adalah 'terima'
+	// 	if ($status == 'terima') {
+	// 		// Mulai transaksi
+	// 		$this->db->trans_start();
+
+	// 		try {
+	// 			// Looping untuk setiap barang pinjam
+	// 			foreach ($barang_pinjam as $value) {
+	// 				// Ambil stok dari kondisi_terkini
+	// 				$stok_terkini = $this->kondisiterkinimodel->get_data_by_id($value['kondisi_terkini_id']);
+
+	// 				// Cek apakah stok cukup
+	// 				if ($stok_terkini < $value['jumlah']) {
+	// 					throw new Exception('Stok tidak cukup, silakan sesuaikan permintaan sesuai stok yang tersedia.');
+	// 				}
+
+	// 				// Insert data ke barang keluar
+	// 				$data_barang_keluar = [
+	// 					'jumlah' => $value['jumlah'],
+	// 					'tanggal' => date('Y-m-d'),
+	// 					'kondisi_terkini_id' => $value['kondisi_terkini_id'],
+	// 					'batch_id' => $value['batch_id'],
+	// 					'kategori' => 'pinjaman',
+	// 				];
+
+	// 				// Simpan ke database
+	// 				if ($this->barangkeluarmodel->insert_data($data_barang_keluar)) {
+	// 					// Update stok
+	// 					if (!$this->kondisiterkinimodel->update_jumlah($value['kondisi_terkini_id'], $value['jumlah'], 'kurangi')) {
+	// 						throw new Exception('Gagal mengupdate jumlah stok.');
+	// 					}
+	// 				} else {
+	// 					throw new Exception('Gagal menyimpan data barang keluar.');
+	// 				}
+
+	// 			}
+
+	// 			// Update status diterima pada peminjaman
+	// 			$this->db->where('batch_id', $batch_id);
+	// 			$this->db->update('peminjaman', ['status_diterima' => 'terima', 'pesan' => $pesan]);
+
+	// 			// Cek apakah konfirmasi berhasil
+	// 			if ($this->db->affected_rows() == 0) {
+	// 				throw new Exception('Gagal konfirmasi data peminjaman dengan batch ID: ' . $batch_id);
+	// 			}
+
+	// 			// Commit jika semua operasi berhasil
+	// 			$this->db->trans_complete();
+
+	// 			// Cek status transaksi
+	// 			if ($this->db->trans_status() === false) {
+	// 				throw new Exception('Terjadi kesalahan saat melakukan konfirmasi.');
+	// 			}
+
+	// 			// Jika sukses
+	// 			$this->session->set_flashdata('success', 'Konfirmasi berhasil!');
+	// 		} catch (Exception $e) {
+	// 			// Rollback jika ada kesalahan
+	// 			$this->db->trans_rollback();
+	// 			$this->session->set_flashdata('error', $e->getMessage());
+	// 		}
+
+	// 	} elseif ($status == 'tolak') {
+	// 		// Update peminjaman status menjadi tolak
+	// 		$this->db->where('batch_id', $batch_id);
+	// 		$this->db->update('peminjaman', ['status_diterima' => 'tolak']);
+	// 	}
+
+	// 	// Redirect kembali ke halaman peminjaman
+	// 	redirect('hodaccess/peminjaman');
+	// }
 
 	public function stokbarang()
 	{

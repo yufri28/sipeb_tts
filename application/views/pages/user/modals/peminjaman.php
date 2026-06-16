@@ -250,6 +250,7 @@ $(document).ready(function() {
                                  <thead>
                                      <tr>
                                          <th>No</th>
+                                         <th>Kode Barang</th>
                                          <th>Jenis Barang</th>
                                          <th>Jumlah Barang</th>
                                      </tr>
@@ -257,9 +258,10 @@ $(document).ready(function() {
                                  <tbody>
                                      <?php $i = 1;?>
                                      <?php foreach ($barang_pinjam as $key => $barang) :?>
-                                     <?php if($value['batch_id'] == $barang['batch_id']):?>
+                                     <?php if($barang['batch_id'] == $value['batch_id']):?>
                                      <tr>
                                          <td><?=$i++;?>.</td>
+                                         <td><?=$barang['kode'];?></td>
                                          <td><?=$barang['nama_jenisbarang'];?></td>
                                          <td><?=$barang['jumlah'];?></td>
                                      </tr>

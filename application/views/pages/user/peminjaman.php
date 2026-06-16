@@ -28,11 +28,16 @@
                     <div class="card-header">
                         <div class="card-header">
                             <div class="d-flex align-items-center">
-                                <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal"
+                                <!-- <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal"
                                     data-bs-target="#addModal">
                                     <i class="fa fa-plus"></i>
                                     Add Row
-                                </button>
+                                </button> -->
+                                <a href="<?=base_url("useraccess/peminjaman_barang");?>"
+                                    class="btn btn-primary btn-round ms-auto">
+                                    <i class="fa fa-plus"></i>
+                                    Add Row
+                                </a>
                             </div>
                         </div>
                         <div class="d-flex">
@@ -66,7 +71,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Tanggal</th>
-                                        <th>Jenis Barang</th>
+                                        <!-- <th>Jenis Barang</th> -->
                                         <th>Jumlah Barang</th>
                                         <th>Tanggal Peminjaman</th>
                                         <th>Tanggal Pengembalian</th>
@@ -86,7 +91,7 @@
                                     <tr>
                                         <td><?=$i++;?>.</td>
                                         <td><?= date('d-m-Y', strtotime($peminjaman['tanggal_pengajuan'])); ?></td>
-                                        <td><?=$peminjaman['nama_jenisbarang'];?></td>
+                                        <!-- <td><?=$peminjaman['nama_jenisbarang'];?></td> -->
                                         <td><?=$peminjaman['jumlah_barang'];?></td>
                                         <td><?=date('d-m-Y', strtotime($peminjaman['tanggal_pinjam']));?>
                                         <td><?=date('d-m-Y', strtotime($peminjaman['tanggal_kembali']));?>

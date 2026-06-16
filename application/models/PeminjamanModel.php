@@ -103,10 +103,11 @@ class PeminjamanModel extends CI_Model {
 
     public function get_barang_pinjam($id = null)
     {   
-        $this->db->select('barang_pinjam.*, master_jenis_barang.*');
+        $this->db->select('barang_pinjam.*, master_jenis_barang.*, detail_kondisi.*');
 		$this->db->from('barang_pinjam');
         $this->db->join('peminjaman', 'peminjaman.batch_id = barang_pinjam.batch_id', 'left');
-        $this->db->join('kondisi_terkini', 'kondisi_terkini.id_kondisi_terkini = barang_pinjam.kondisi_terkini_id', 'left');
+        $this->db->join('detail_kondisi', 'detail_kondisi.id_detail = barang_pinjam.kondisi_terkini_id', 'left');
+        $this->db->join('kondisi_terkini', 'kondisi_terkini.id_kondisi_terkini = detail_kondisi.kondisi_terkini_id', 'left');
         $this->db->join('stok', 'stok.id_stok = kondisi_terkini.stok_id', 'left');
         $this->db->join('master_jenis_barang', 'master_jenis_barang.id_jenisbarang = stok.jenis_barang_id', 'left');
 		if($id != null){
